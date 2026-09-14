@@ -79,3 +79,22 @@ async def test_postgres_probe_uses_tcp(svc, monkeypatch):
     async with httpx.AsyncClient() as c:
         h = await probe(svc["litellm-postgres"], c, SETTINGS)
     assert h.state == "healthy" and h.reason == "tcp open"
+
+
+@respx.mock
+async def test_omlx_invalid_json_body_is_reachable_unhealthy(svc):
+    respx.get("http://10.0.0.5:8000/health").mock(
+        return_value=httpx.Response(200, content=b"not json", headers={"content-type": "application/json"}))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["omlx"], c, SETTINGS)
+    assert h.state == "reachable-unhealthy" and "invalid JSON body" in h.reason
+
+
+@respx.mock
+async def test_litellm_invalid_json_body_is_degraded(svc):
+    respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
+    respx.get("http://litellm:4000/health").mock(
+        return_value=httpx.Response(200, content=b"not json", headers={"content-type": "application/json"}))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["litellm"], c, SETTINGS)
+    assert h.state == "degraded" and "JSONDecodeError" in h.reason

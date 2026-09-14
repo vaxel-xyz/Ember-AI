@@ -59,7 +59,10 @@ async def _probe_omlx(service: Service, client: httpx.AsyncClient, settings: Set
     except httpx.TimeoutException:
         return ServiceHealth(service.id, "unreachable", f"timeout after {service.health_timeout}s")
     ms = round((time.perf_counter() - t0) * 1000, 1)
-    body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    try:
+        body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    except ValueError:
+        return ServiceHealth(service.id, "reachable-unhealthy", f"HTTP {r.status_code}, invalid JSON body", ms)
     if r.status_code == 503 and body.get("status") == "loading":
         return ServiceHealth(service.id, "starting", "oMLX preloading pinned models", ms, body)
     if r.status_code >= 400:
@@ -90,7 +93,7 @@ async def _probe_litellm(service: Service, client: httpx.AsyncClient, settings: 
         return ServiceHealth(service.id, "reachable-unhealthy", f"readiness HTTP {r.status_code}", ms)
     try:
         dep = await lite.deployment_health()
-    except httpx.HTTPError as exc:
+    except (httpx.HTTPError, ValueError) as exc:
         return ServiceHealth(service.id, "degraded", f"readiness ok, /health failed: {exc.__class__.__name__}", ms)
     detail = {"healthy_count": dep.get("healthy_count", 0), "unhealthy_count": dep.get("unhealthy_count", 0),
               "unhealthy": [e.get("model") for e in dep.get("unhealthy_endpoints", [])]}
