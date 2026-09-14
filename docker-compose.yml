@@ -74,7 +74,7 @@ services:
     profiles: [qdrant]
     restart: unless-stopped
     environment:
-      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?QDRANT_API_KEY must be set (it ships in .env.example; keep the line even if the qdrant profile is unused)}
     volumes: [qdrant-data:/qdrant/storage]
     ports: ["${BIND_ADDRESS:-127.0.0.1}:${QDRANT_PORT:-6333}:6333"]
     deploy: { resources: { limits: { memory: 1G } } }
