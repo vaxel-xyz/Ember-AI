@@ -40,6 +40,12 @@
   '''^archive/cookbook/android-labs/cookbooks/agent-template-writing\.md$''',
   '''^archive/cookbook/android-labs/docs/LIVEKIT-DEPLOYMENT-GUIDE\.md$''',
   '''^archive/cookbook/android-labs/products/privacy-shield/test_shield\.py$''',
+  # KNOWN UPSTREAM DISCLOSURE — not a false positive. Osmantic ODS committed a
+  # likely-real LiveKit API key/secret here (see upstream SECURITY_AUDIT.md,
+  # finding C1, commit ce863df7a). The file is deleted; the blob remains in
+  # inherited history exactly as in the public upstream repo. Rotation is the
+  # upstream account owner's responsibility. Allowlisted so the scan gate stays
+  # meaningful for new commits; purge via git filter-repo is a separate decision.
   '''^archive/cookbook/voice-agent-framework/core/hvac-token-server\.py$''',
   '''^dream-server/config/searxng/settings\.yml$''',
   '''^dream-server/extensions/services/ape/tests/conftest\.py$''',

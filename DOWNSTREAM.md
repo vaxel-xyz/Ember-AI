@@ -21,6 +21,9 @@ TEI embeddings, Whisper, Kokoro containers, privacy-shield, token-spy, ods-proxy
 extension library/templates, Tauri installer, all ODS docs, `.github/` (issue templates, dependabot config,
 AI-automation prompts/scripts — Task 11 recreates `.github/workflows/` from scratch).
 
+## Inherited history notes
+A LiveKit API key/secret committed to upstream at `archive/cookbook/voice-agent-framework/core/hvac-token-server.py` is a likely-real credential, not a placeholder, per upstream's own `SECURITY_AUDIT.md` (finding C1, commit `ce863df7a7`). The file no longer exists in Ember-AI's tree, but the blob remains reachable through inherited git history; it is allowlisted (with the same annotation) in `.gitleaks.toml` rather than purged, since rotation is the upstream account owner's call and a history rewrite is a separate decision.
+
 ## Cherry-pick procedure
 `git fetch upstream && git log upstream/main -- <path>`; apply with `git cherry-pick -x <sha>` or copy the
 file into the matching donor location; record the sha here.
