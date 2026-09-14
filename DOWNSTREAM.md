@@ -18,7 +18,8 @@ overlays, 27 services) is deleted rather than overlaid.
 installer + phases, `ods-cli`, host agent, model switchboard/router, remote-provider egress/ssh tunnel,
 llama-server, Open WebUI, Hermes/hermes-proxy, n8n, APE, OpenClaw, SearXNG, Perplexica, brave-search, ComfyUI,
 TEI embeddings, Whisper, Kokoro containers, privacy-shield, token-spy, ods-proxy, Tailscale, OpenCode,
-extension library/templates, Tauri installer, all ODS docs.
+extension library/templates, Tauri installer, all ODS docs, `.github/` (issue templates, dependabot config,
+AI-automation prompts/scripts — Task 11 recreates `.github/workflows/` from scratch).
 
 ## Cherry-pick procedure
 `git fetch upstream && git log upstream/main -- <path>`; apply with `git cherry-pick -x <sha>` or copy the
