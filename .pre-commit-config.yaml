@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: shellcheck
         name: shellcheck (installer + scripts, errors only)
-        files: ^ods/(installers|scripts)/.*\.(sh|bash)$
+        files: ^(bin/ember|tests/.*\.sh)$
         args: ['--exclude=SC1091,SC2034', '--severity=error']
 
       # Catch legacy `…` command substitution anywhere in the installer
@@ -35,7 +35,7 @@ repos:
       # is currently zero-SC2006, so this hook starts as a regression guard.
       - id: shellcheck
         name: shellcheck SC2006 (no legacy backticks)
-        files: ^ods/(installers|scripts)/.*\.(sh|bash)$
+        files: ^(bin/ember|tests/.*\.sh)$
         args: ['--include=SC2006']
 
   # Custom local hook (issue #509): forbid backticks inside the BODY of
