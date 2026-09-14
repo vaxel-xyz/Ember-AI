@@ -11,7 +11,9 @@ model_list:
   - model_name: ember-vision
     litellm_params: {model: "openai/${OMLX_VISION_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
   - model_name: ember-embed
-    litellm_params: {model: "openai/${OMLX_EMBED_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+    litellm_params: {model: "openai/${OMLX_EMBED_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY", encoding_format: "float"}
+  - model_name: ember-rerank
+    litellm_params: {model: "jina_ai/${OMLX_RERANK_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
   - model_name: ember-stt
     litellm_params: {model: "openai/${OMLX_STT_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
   - model_name: ember-tts
