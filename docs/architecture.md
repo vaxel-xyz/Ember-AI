@@ -110,7 +110,7 @@ Every service resolves to one of five states — never green on TCP alone:
 | State | Meaning |
 |---|---|
 | `healthy` | reachable and functional |
-| `degraded` | reachable, HTTP 200, but not functional (oMLX `loaded_count == 0`; LiteLLM readiness ok, zero healthy deployments) |
+| `degraded` | reachable, HTTP 200, but not functional — oMLX `loaded_count == 0`; for the gateway, readiness is fine but `/model/info` is unavailable or is missing published aliases (i.e. an alias is not routable at all). A gateway that can route every alias is `healthy` even if a deep check later reports individual deployments unhealthy — those are listed in the deep check's `unhealthy_endpoints`, not held against the gateway's state. |
 | `starting` | oMLX 503 with `status: loading` |
 | `reachable-unhealthy` | HTTP ≥ 400 outside the defined states |
 | `unreachable` | connect failure, DNS failure, or timeout |
