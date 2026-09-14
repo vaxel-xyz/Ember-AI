@@ -2,8 +2,8 @@
 """Render ember.yaml.tmpl by substituting ${VAR} from the environment. Fails on any missing variable."""
 import os
 import sys
+from collections.abc import Mapping
 from string import Template
-from typing import Mapping
 
 
 def render(template_text: str, env: Mapping[str, str]) -> str:
