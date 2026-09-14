@@ -32,7 +32,7 @@ jobs:
     needs: [python, dashboard]
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with: { context: ember-api, push: false, tags: ember-api:ci }
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with: { context: dashboard, push: false, tags: ember-dashboard:ci }
