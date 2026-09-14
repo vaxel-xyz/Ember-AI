@@ -1,14 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
-const STORAGE_KEY = 'ods-theme'
-const THEMES = ['ods', 'lemonade', 'light', 'arctic']
+const STORAGE_KEY = 'ember-theme'
+const THEMES = ['dark', 'lemonade', 'light', 'arctic']
 const THEME_LABELS = {
-  ods: 'Dark',
+  dark: 'Dark',
   lemonade: 'Lemonade',
   light: 'Light',
   arctic: 'Arctic'
 }
-const DEFAULT_THEME = 'ods'
+const DEFAULT_THEME = 'dark'
 
 const ThemeContext = createContext(null)
 

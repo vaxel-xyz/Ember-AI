@@ -17,24 +17,22 @@
   regex = '''sk-lf-[0-9a-f]+\b'''
   keywords = ["sk-lf-"]
 
-[[allowlists]]
-  description = "Placeholder templates only"
-  paths = [ '''\.env\.example$''' ]
-
 # Enabling [extend] above surfaces 54 pre-existing findings in git history
 # inherited from the pre-lean-rebuild codebase (deleted paths under
 # archive/, dream-server/, ods/, resources/ — none exist at HEAD; see
-# `git log --diff-filter=D` for their removal). Verified each by hand:
-# jwt.io canonical example tokens, doc placeholders (YOUR_TOKEN,
-# your-api-key), test/cookbook fixture values (sk-abc123xyz789abcdef,
-# fictional-secret-098765, test-ape-key-12345), a searxng template
-# default, and a demo LiveKit key/secret pair already called out by a
-# prior audit (SECURITY_AUDIT.md, same commit era) in an archived
-# cookbook. No live credential among them. Allowlisted by exact
-# (now-dead) path rather than by pattern or directory glob, so this
-# does not weaken detection on any file present in the current tree.
+# `git log --diff-filter=D` for their removal). Each was reviewed by hand.
+# All but one are placeholders or fixtures: jwt.io canonical example
+# tokens, doc placeholders (YOUR_TOKEN, your-api-key), test/cookbook
+# fixture values (sk-abc123xyz789abcdef, fictional-secret-098765,
+# test-ape-key-12345) and a searxng template default. The exception is the
+# LiveKit key/secret pair annotated inline below, which upstream's own
+# SECURITY_AUDIT.md classes as a real disclosure — it is allowlisted to
+# keep the gate meaningful, not because it is a false positive.
+# Allowlisted by exact (now-dead) path rather than by pattern or directory
+# glob, so this does not weaken detection on any file present in the
+# current tree.
 [[allowlists]]
-  description = "Dead history from pre-rebuild codebase (deleted, verified false-positive)"
+  description = "Dead history from pre-rebuild codebase (deleted paths; hand-reviewed — all placeholders or fixtures except the LiveKit pair called out below, which is a real upstream disclosure)"
   paths = [
   '''^SECURITY_AUDIT\.md$''',
   '''^archive/cookbook/android-labs/cookbooks/agent-template-writing\.md$''',

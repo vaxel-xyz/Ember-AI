@@ -7,12 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Legacy palette (kept for backward compat)
-        ods: {
-          bg: '#0f0f13',
-          card: '#18181b',
-          border: '#27272a'
-        },
         // Theme-aware colors driven by CSS custom properties.
         // Values use rgb() with <alpha-value> so Tailwind's opacity-modifier
         // syntax (e.g. bg-theme-card/95) can inject the alpha channel.

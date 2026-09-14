@@ -1,29 +1,4 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-build/
-
-# Logs
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Config backups (may contain user paths)
-config.yaml.bak
-
-# Temporary
-*.tmp
-*.swp
-
-# Secrets and credentials (global)
+# Secrets and credentials
 .env
 .env.*
 !.env.example
@@ -32,54 +7,38 @@ config.yaml.bak
 *.p12
 *.pfx
 *.crt
+*.keystore
 credentials.*
 secrets.*
 secrets/
-*.keystore
 
-# Token Spy runtime
-token-spy/data/
-token-spy/*.db
-token-spy/*.sqlite
-
-# ============================================
-# ODS runtime/build artifacts
-# ============================================
-ods/.env
-ods/.env.*
-!ods/.env.example
-ods/data/
-ods/models/
-ods/config/openclaw/workspace/
-ods/**/node_modules/
-ods/**/dist/
-ods/**/.coverage
-ods/preflight-*.log
-ods/.current-mode
-ods/.profiles
-ods/.claude/
-ods/.pytest_cache/
-ods/tests/__pycache__/
-ods/internal/
-ods/.cache/
-
-# ============================================
-# Archived / deprecated code (pre-v2.0)
-# ============================================
-archive/
-.claude/
-!.claude/commands/
-
-# ============================================
-# Ember-AI lean rebuild
-# ============================================
-.env
-.env.*
-!.env.example
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.venv/
 ember-api/.venv/
-ember-api/**/__pycache__/
+
+# Node / dashboard
 dashboard/node_modules/
 dashboard/dist/
+
+# Logs and scratch
+*.log
+*.tmp
+*.swp
+config.yaml.bak
 tests/.tmp/
+
+# Tooling / editors
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.claude/
+!.claude/commands/
 .superpowers/
-.venv/

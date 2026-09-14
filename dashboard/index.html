@@ -18,8 +18,8 @@
     <script>
       // Prevent flash of wrong theme — runs before React
       (function() {
-        var t = localStorage.getItem('ods-theme');
-        if (t && t !== 'ods') document.documentElement.setAttribute('data-theme', t);
+        var t = localStorage.getItem('ember-theme');
+        if (t && t !== 'dark') document.documentElement.setAttribute('data-theme', t);
       })();
     </script>
     <style>
