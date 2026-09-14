@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from urllib.parse import urlsplit
 
 import httpx
 from fastapi import APIRouter, Depends, Request
@@ -10,15 +11,31 @@ from ..settings import Settings, get_settings
 router = APIRouter(prefix="/api", dependencies=[Depends(require_api_key)])
 
 
-def _ui_url(svc) -> str | None:
+def _strip_api_suffix(base: str) -> str:
+    """`LLM_PUBLIC_URL` is the OpenAI-shaped API root (`.../v1`); the UI lives beside it."""
+    base = base.rstrip("/")
+    return base.removesuffix("/v1")
+
+
+def _ui_url(svc, settings: Settings) -> str | None:
+    """A URL a browser can actually open.
+
+    Container hostnames (`litellm`, `qdrant`) only resolve inside the compose network, so a
+    Docker service without a public URL is addressed via the Docker VM's LAN address — taken
+    from the host part of `LLM_INTERNAL_URL` — on its published port.
+    """
     if not svc.external_link:
         return None
-    base = svc.public_url or f"http://{svc.host}:{svc.external_port}"
-    return base.rstrip("/") + svc.ui_path
+    if svc.public_url:
+        base = _strip_api_suffix(svc.public_url)
+    else:
+        host = urlsplit(settings.llm_internal_url).hostname or svc.host
+        base = f"http://{host}:{svc.external_port}"
+    return base + svc.ui_path
 
 
 @router.get("/services")
-async def services(request: Request):
+async def services(request: Request, settings: Settings = Depends(get_settings)):  # noqa: B008
     reg = request.app.state.registry
     out = []
     for svc in reg.services.values():
@@ -27,7 +44,7 @@ async def services(request: Request):
             "id": svc.id, "name": svc.name, "node": svc.node, "role": svc.role, "managed": svc.managed,
             "type": svc.type, "category": svc.category, "capabilities": svc.capabilities,
             "state": h.state if h else "unknown", "reason": h.reason if h else "not polled yet",
-            "latency_ms": h.latency_ms if h else None, "detail": h.detail if h else {}, "ui_url": _ui_url(svc),
+            "latency_ms": h.latency_ms if h else None, "detail": h.detail if h else {}, "ui_url": _ui_url(svc, settings),
         })
     return {"polled_at": reg.polled_at.isoformat() if reg.polled_at else None, "services": out}
 
