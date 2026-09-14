@@ -10,6 +10,27 @@
 | `reachable-unhealthy` | HTTP ≥ 400 outside the states above, or a non-JSON body. | Check the status code and body in `docker compose logs` (LiteLLM) or a manual `curl` against the service's health path; usually an auth or config error, not a network one. |
 | `unreachable` | Connect failure, DNS failure, or timeout. | Confirm the host is up (`ping`/`ssh`), the port is open, and `OMLX_HOST`/`OMLX_BASE_URL` in `.env` match the mini's actual LAN IP. |
 
+## Deep gateway check (on demand)
+
+The `/api/services` poll loop only does a **shallow** gateway probe (`/health/readiness` +
+`/model/info`) because LiteLLM's `GET /health` issues a live call per deployment. When you
+need per-deployment truth, ask for it explicitly:
+
+```bash
+curl -sf -X POST "http://172.20.142.7:3002/api/services/refresh?deep=true" \
+  -H "Authorization: Bearer $EMBER_API_KEY" | python3 -m json.tool
+```
+
+The `gateway` object in the response carries LiteLLM's `healthy_endpoints` /
+`unhealthy_endpoints` lists. Expect non-chat deployments (embed, rerank, audio) to be
+reported accurately only because the template pins `model_info.mode` on each of them; a
+deployment reported unhealthy there is still worth confirming with a real request before
+changing config. `bin/ember doctor` is the other deep path — it makes real `ember-auto` and
+`ember-embed` calls.
+
+Do not poll either of these on a timer. Doing so is what caused the Phase 1 incident where a
+15 s loop fired ~10 inference requests at the mini every ~30 s.
+
 ## `omlx restart`
 
 ```bash

@@ -5,6 +5,7 @@ from typing import Literal
 
 import httpx
 
+from .aliases import ALIAS_NAMES
 from .litellm_client import LiteLLMClient
 from .manifests import Service
 from .omlx import OmlxClient
@@ -80,6 +81,12 @@ async def _probe_omlx(service: Service, client: httpx.AsyncClient, settings: Set
 
 
 async def _probe_litellm(service: Service, client: httpx.AsyncClient, settings: Settings) -> ServiceHealth:
+    """Shallow gateway probe: readiness + registered alias set. Never triggers inference.
+
+    LiteLLM's ``GET /health`` runs a live call per deployment, so it stays out of the poll
+    loop entirely; deep per-deployment checks are on demand only (see
+    ``POST /api/services/refresh?deep=true`` and ``bin/ember doctor``).
+    """
     lite = LiteLLMClient(f"http://{service.host}:{service.port}", settings.litellm_master_key, client)
     t0 = time.perf_counter()
     try:
@@ -92,14 +99,15 @@ async def _probe_litellm(service: Service, client: httpx.AsyncClient, settings: 
     if r.status_code >= 400:
         return ServiceHealth(service.id, "reachable-unhealthy", f"readiness HTTP {r.status_code}", ms)
     try:
-        dep = await lite.deployment_health()
+        info = await lite.model_info()
     except (httpx.HTTPError, ValueError) as exc:
-        return ServiceHealth(service.id, "degraded", f"readiness ok, /health failed: {exc.__class__.__name__}", ms)
-    detail = {"healthy_count": dep.get("healthy_count", 0), "unhealthy_count": dep.get("unhealthy_count", 0),
-              "unhealthy": [e.get("model") for e in dep.get("unhealthy_endpoints", [])]}
-    if detail["unhealthy_count"]:
-        return ServiceHealth(service.id, "degraded", f"{detail['unhealthy_count']} deployment(s) unhealthy", ms, detail)
-    return ServiceHealth(service.id, "healthy", f"{detail['healthy_count']} deployment(s) healthy", ms, detail)
+        return ServiceHealth(service.id, "degraded", f"readiness ok, /model/info failed: {exc.__class__.__name__}", ms)
+    registered = {m.get("model_name") for m in info if isinstance(m, dict)}
+    missing = [a for a in ALIAS_NAMES if a not in registered]
+    detail = {"aliases_registered": len(ALIAS_NAMES) - len(missing), "aliases_expected": len(ALIAS_NAMES), "missing": missing}
+    if missing:
+        return ServiceHealth(service.id, "degraded", f"{len(missing)} alias(es) not registered: {', '.join(missing)}", ms, detail)
+    return ServiceHealth(service.id, "healthy", f"{detail['aliases_registered']}/{detail['aliases_expected']} aliases registered", ms, detail)
 
 
 async def _probe_postgres(service: Service) -> ServiceHealth:

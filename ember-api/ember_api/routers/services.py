@@ -1,8 +1,11 @@
 from datetime import UTC, datetime
 
+import httpx
 from fastapi import APIRouter, Depends, Request
 
+from ..litellm_client import LiteLLMClient
 from ..security import require_api_key
+from ..settings import Settings, get_settings
 
 router = APIRouter(prefix="/api", dependencies=[Depends(require_api_key)])
 
@@ -29,10 +32,35 @@ async def services(request: Request):
     return {"polled_at": reg.polled_at.isoformat() if reg.polled_at else None, "services": out}
 
 
+async def _deep_gateway_check(request: Request, settings: Settings) -> dict:
+    """Run LiteLLM's per-deployment ``GET /health`` once, on demand.
+
+    This issues a live call per deployment, which is why it is never in the poll loop.
+    """
+    svc = request.app.state.registry.services.get("litellm")
+    base = f"http://{svc.host}:{svc.port}" if svc else settings.litellm_base_url
+    lite = LiteLLMClient(base, settings.litellm_master_key, request.app.state.http)
+    try:
+        dep = await lite.deployment_health()
+    except (httpx.HTTPError, ValueError) as exc:
+        return {"ok": False, "error": exc.__class__.__name__}
+    return {
+        "ok": not dep.get("unhealthy_count", 0),
+        "healthy_count": dep.get("healthy_count", 0),
+        "unhealthy_count": dep.get("unhealthy_count", 0),
+        "healthy_endpoints": dep.get("healthy_endpoints", []),
+        "unhealthy_endpoints": dep.get("unhealthy_endpoints", []),
+    }
+
+
 @router.post("/services/refresh")
-async def refresh(request: Request):
+async def refresh(request: Request, deep: bool = False, settings: Settings = Depends(get_settings)):  # noqa: B008
+    """Re-poll every service. ``?deep=true`` additionally runs the gateway deep check."""
     await request.app.state.registry.poll_once()
-    return {"polled_at": datetime.now(UTC).isoformat()}
+    out: dict = {"polled_at": datetime.now(UTC).isoformat(), "deep": deep}
+    if deep:
+        out["gateway"] = await _deep_gateway_check(request, settings)
+    return out
 
 
 @router.get("/nodes")

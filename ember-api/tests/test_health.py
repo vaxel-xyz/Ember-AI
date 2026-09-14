@@ -2,6 +2,7 @@ import httpx
 import pytest
 import respx
 
+from ember_api.aliases import ALIAS_NAMES
 from ember_api.health import probe
 from ember_api.manifests import load_manifests
 from ember_api.settings import Settings
@@ -59,15 +60,50 @@ async def test_generic_http_500_is_reachable_unhealthy(svc):
     assert h.state == "reachable-unhealthy" and "HTTP 500" in h.reason
 
 
+def _model_info(aliases):
+    return {"data": [{"model_name": a, "litellm_params": {}} for a in aliases]}
+
+
 @respx.mock
-async def test_litellm_degraded_when_a_deployment_is_unhealthy(svc):
+async def test_litellm_degraded_when_an_alias_is_missing(svc):
     respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
-    respx.get("http://litellm:4000/health").mock(return_value=httpx.Response(200, json={
-        "healthy_endpoints": [{"model": "openrouter/z-ai/glm-5.3"}], "unhealthy_endpoints": [{"model": "openai/Ornith-1.5-9B-MLX-4bit", "error": "connect"}],
-        "healthy_count": 1, "unhealthy_count": 1}))
+    respx.get("http://litellm:4000/model/info").mock(
+        return_value=httpx.Response(200, json=_model_info([a for a in ALIAS_NAMES if a != "ember-rerank"])))
     async with httpx.AsyncClient() as c:
         h = await probe(svc["litellm"], c, SETTINGS)
-    assert h.state == "degraded" and h.detail["unhealthy_count"] == 1
+    assert h.state == "degraded"
+    assert h.detail["missing"] == ["ember-rerank"]
+    assert h.detail["aliases_registered"] == len(ALIAS_NAMES) - 1
+    assert h.detail["aliases_expected"] == len(ALIAS_NAMES)
+
+
+@respx.mock
+async def test_litellm_healthy_when_full_alias_set_registered(svc):
+    respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
+    respx.get("http://litellm:4000/model/info").mock(return_value=httpx.Response(200, json=_model_info(ALIAS_NAMES)))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["litellm"], c, SETTINGS)
+    assert h.state == "healthy"
+    assert h.detail == {"aliases_registered": len(ALIAS_NAMES), "aliases_expected": len(ALIAS_NAMES), "missing": []}
+
+
+@respx.mock
+async def test_litellm_probe_never_calls_live_health_endpoint(svc):
+    """C1 regression guard: LiteLLM GET /health runs a live inference call per deployment."""
+    respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
+    respx.get("http://litellm:4000/model/info").mock(return_value=httpx.Response(200, json=_model_info(ALIAS_NAMES)))
+    deep = respx.get("http://litellm:4000/health").mock(return_value=httpx.Response(200, json={"healthy_count": 0}))
+    async with httpx.AsyncClient() as c:
+        await probe(svc["litellm"], c, SETTINGS)
+    assert deep.called is False
+
+
+@respx.mock
+async def test_litellm_reachable_unhealthy_when_readiness_errors(svc):
+    respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(503, json={"status": "error"}))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["litellm"], c, SETTINGS)
+    assert h.state == "reachable-unhealthy" and "readiness HTTP 503" in h.reason
 
 
 async def test_postgres_probe_uses_tcp(svc, monkeypatch):
@@ -93,7 +129,7 @@ async def test_omlx_invalid_json_body_is_reachable_unhealthy(svc):
 @respx.mock
 async def test_litellm_invalid_json_body_is_degraded(svc):
     respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
-    respx.get("http://litellm:4000/health").mock(
+    respx.get("http://litellm:4000/model/info").mock(
         return_value=httpx.Response(200, content=b"not json", headers={"content-type": "application/json"}))
     async with httpx.AsyncClient() as c:
         h = await probe(svc["litellm"], c, SETTINGS)

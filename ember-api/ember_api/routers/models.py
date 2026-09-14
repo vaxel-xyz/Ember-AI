@@ -3,18 +3,13 @@ import os
 import httpx
 from fastapi import APIRouter, Depends, Request
 
+from ..aliases import ALIASES
 from ..omlx import OmlxClient
 from ..security import require_api_key
 from ..settings import Settings, get_settings
 
 router = APIRouter(prefix="/api", dependencies=[Depends(require_api_key)])
 
-ALIASES: list[tuple[str, str, str]] = [  # alias, provider, env var holding model id
-    ("ember-auto", "omlx", "OMLX_CHAT_MODEL"), ("ember-local", "omlx", "OMLX_CHAT_MODEL"), ("ember-fast", "omlx", "OMLX_FAST_MODEL"),
-    ("ember-code", "omlx", "OMLX_CODE_MODEL"), ("ember-vision", "omlx", "OMLX_VISION_MODEL"), ("ember-embed", "omlx", "OMLX_EMBED_MODEL"),
-    ("ember-rerank", "omlx", "OMLX_RERANK_MODEL"),
-    ("ember-stt", "omlx", "OMLX_STT_MODEL"), ("ember-tts", "omlx", "OMLX_TTS_MODEL"), ("ember-think", "openrouter", "OPENROUTER_THINK_MODEL"),
-]
 CAPABILITY_ENV = {"llm": "OMLX_CHAT_MODEL", "vision": "OMLX_VISION_MODEL", "embeddings": "OMLX_EMBED_MODEL",
                   "rerank": "OMLX_RERANK_MODEL", "stt": "OMLX_STT_MODEL", "tts": "OMLX_TTS_MODEL"}
 

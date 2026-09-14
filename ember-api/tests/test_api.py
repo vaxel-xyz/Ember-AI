@@ -80,3 +80,33 @@ def test_config_validate_reports_missing_alias_model(client, monkeypatch):
     body = client.get("/api/config/validate", headers=AUTH).json()
     assert body["ok"] is False
     assert any(c["name"] == "env:OMLX_TTS_MODEL" and not c["ok"] for c in body["checks"])
+
+
+@respx.mock
+def test_shallow_refresh_does_not_deep_check(client):
+    respx.get("http://10.0.0.5:8000/health").mock(side_effect=httpx.ConnectError("x"))
+    respx.get(url__regex=r"http://(litellm|ember-api|ember-dashboard|qdrant):.*").mock(side_effect=httpx.ConnectError("x"))
+    deep = respx.get("http://litellm:4000/health").mock(return_value=httpx.Response(200, json={"healthy_count": 1}))
+    body = client.post("/api/services/refresh", headers=AUTH).json()
+    assert body["deep"] is False and "gateway" not in body
+    assert deep.called is False
+
+
+@respx.mock
+def test_deep_refresh_runs_deployment_health(client):
+    respx.get("http://10.0.0.5:8000/health").mock(side_effect=httpx.ConnectError("x"))
+    respx.get("http://litellm:4000/health/readiness").mock(side_effect=httpx.ConnectError("x"))
+    respx.get(url__regex=r"http://(ember-api|ember-dashboard|qdrant):.*").mock(side_effect=httpx.ConnectError("x"))
+    respx.get("http://litellm:4000/health").mock(return_value=httpx.Response(200, json={
+        "healthy_endpoints": [{"model": "openai/Ornith-1.5-9B-MLX-4bit"}],
+        "unhealthy_endpoints": [{"model": "openrouter/z-ai/glm-5.3", "error": "401"}],
+        "healthy_count": 1, "unhealthy_count": 1}))
+    body = client.post("/api/services/refresh?deep=true", headers=AUTH).json()
+    assert body["deep"] is True
+    assert body["gateway"]["ok"] is False
+    assert body["gateway"]["healthy_count"] == 1
+    assert body["gateway"]["unhealthy_endpoints"] == [{"model": "openrouter/z-ai/glm-5.3", "error": "401"}]
+
+
+def test_deep_refresh_requires_key(client):
+    assert client.post("/api/services/refresh?deep=true").status_code == 401

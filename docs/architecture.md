@@ -77,6 +77,8 @@ every route. Endpoints:
 | `GET /api/capabilities` | derived from oMLX health + env | llm/vision/embed/rerank/stt/tts availability |
 | `GET /api/providers` | config + env presence | oMLX, OpenRouter configured/reachable, no secrets echoed |
 | `GET /api/config/validate` | config | same checks as `ember doctor` |
+| `POST /api/services/refresh` | manifests + HTTP probes | force a shallow re-poll now |
+| `POST /api/services/refresh?deep=true` | LiteLLM `GET /health` | on-demand deep gateway check (one live call per deployment) |
 
 ### Service manifests
 
@@ -114,8 +116,20 @@ Every service resolves to one of five states — never green on TCP alone:
 | `unreachable` | connect failure, DNS failure, or timeout |
 
 oMLX probe: `GET /health` (no auth) → parses `status`, `engine_pool.loaded_count`,
-`current_model_memory`, `final_ceiling`. LiteLLM probe: `GET /health/readiness` then
-`GET /health` (per-deployment) with the master key. See `ember-api/ember_api/health.py`.
+`current_model_memory`, `final_ceiling`.
+
+LiteLLM probe (shallow, poll loop): `GET /health/readiness` (unauthenticated) then
+`GET /model/info` with the master key, comparing the returned `model_name`s against the
+alias set in `ember-api/ember_api/aliases.py`. Neither call triggers inference. States:
+`unreachable` on transport error or timeout, `reachable-unhealthy` on readiness ≥ 400,
+`degraded` when `/model/info` fails or is missing aliases, `healthy` otherwise with
+`detail = {aliases_registered, aliases_expected, missing}`.
+
+LiteLLM's `GET /health` is a **deep** check — it performs a live call per deployment — so it
+is never in the poll loop. Run it on demand with
+`POST /api/services/refresh?deep=true` (same bearer as every other route), which returns
+LiteLLM's healthy/unhealthy endpoint lists, or with `bin/ember doctor`, which makes real
+`ember-auto` and `ember-embed` calls. See `ember-api/ember_api/health.py`.
 
 ### ember-dashboard
 
