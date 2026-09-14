@@ -40,10 +40,10 @@ async def _probe_http(service: Service, client: httpx.AsyncClient) -> ServiceHea
     t0 = time.perf_counter()
     try:
         r = await client.get(_url(service), timeout=service.health_timeout)
-    except httpx.ConnectError as exc:
-        return ServiceHealth(service.id, "unreachable", f"connect failed: {exc.__class__.__name__}")
     except httpx.TimeoutException:
         return ServiceHealth(service.id, "unreachable", f"timeout after {service.health_timeout}s")
+    except httpx.TransportError as exc:
+        return ServiceHealth(service.id, "unreachable", f"connect failed: {exc.__class__.__name__}")
     ms = round((time.perf_counter() - t0) * 1000, 1)
     if r.status_code < 400:
         return ServiceHealth(service.id, "healthy", f"HTTP {r.status_code}", ms)
@@ -55,20 +55,22 @@ async def _probe_omlx(service: Service, client: httpx.AsyncClient, settings: Set
     t0 = time.perf_counter()
     try:
         r = await omlx.health(service.health_timeout)
-    except httpx.ConnectError:
-        return ServiceHealth(service.id, "unreachable", "connect failed")
     except httpx.TimeoutException:
         return ServiceHealth(service.id, "unreachable", f"timeout after {service.health_timeout}s")
+    except httpx.TransportError as exc:
+        return ServiceHealth(service.id, "unreachable", f"connect failed: {exc.__class__.__name__}")
     ms = round((time.perf_counter() - t0) * 1000, 1)
     try:
         body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
     except ValueError:
         return ServiceHealth(service.id, "reachable-unhealthy", f"HTTP {r.status_code}, invalid JSON body", ms)
+    if not isinstance(body, dict):
+        return ServiceHealth(service.id, "reachable-unhealthy", f"HTTP {r.status_code}, JSON body is not an object", ms)
     if r.status_code == 503 and body.get("status") == "loading":
         return ServiceHealth(service.id, "starting", "oMLX preloading pinned models", ms, body)
     if r.status_code >= 400:
         return ServiceHealth(service.id, "reachable-unhealthy", f"HTTP {r.status_code}", ms, body)
-    pool = body.get("engine_pool", {})
+    pool = body.get("engine_pool") or {}
     detail = {
         "default_model": body.get("default_model"),
         "model_count": pool.get("model_count"), "loaded_count": pool.get("loaded_count"),
@@ -91,10 +93,10 @@ async def _probe_litellm(service: Service, client: httpx.AsyncClient, settings: 
     t0 = time.perf_counter()
     try:
         r = await lite.readiness(service.health_timeout)
-    except httpx.ConnectError:
-        return ServiceHealth(service.id, "unreachable", "connect failed")
     except httpx.TimeoutException:
         return ServiceHealth(service.id, "unreachable", f"timeout after {service.health_timeout}s")
+    except httpx.TransportError as exc:
+        return ServiceHealth(service.id, "unreachable", f"connect failed: {exc.__class__.__name__}")
     ms = round((time.perf_counter() - t0) * 1000, 1)
     if r.status_code >= 400:
         return ServiceHealth(service.id, "reachable-unhealthy", f"readiness HTTP {r.status_code}", ms)

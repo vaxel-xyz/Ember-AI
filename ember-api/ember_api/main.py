@@ -28,8 +28,16 @@ class Registry:
         self.polled_at = datetime.now(UTC)
 
     async def run(self, interval_s: int) -> None:
+        """Supervisor loop: a probe raising must never stop future polls.
+
+        This is the one place a broad ``except`` is correct — ``asyncio.CancelledError``
+        derives from ``BaseException``, so shutdown still propagates.
+        """
         while True:
-            await self.poll_once()
+            try:
+                await self.poll_once()
+            except Exception:
+                log.exception("poll failed")
             await asyncio.sleep(interval_s)
 
 

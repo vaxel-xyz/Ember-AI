@@ -53,6 +53,33 @@ async def test_unreachable_on_connect_error(svc):
 
 
 @respx.mock
+async def test_unreachable_on_remote_protocol_error(svc):
+    """RemoteProtocolError is a TransportError, not a ConnectError — it used to escape the probe."""
+    respx.get("http://10.0.0.5:8000/health").mock(side_effect=httpx.RemoteProtocolError("peer closed"))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["omlx"], c, SETTINGS)
+    assert h.state == "unreachable" and h.reason == "connect failed: RemoteProtocolError"
+
+
+@respx.mock
+async def test_omlx_null_engine_pool_is_degraded_not_a_crash(svc):
+    respx.get("http://10.0.0.5:8000/health").mock(
+        return_value=httpx.Response(200, json={"status": "healthy", "engine_pool": None}))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["omlx"], c, SETTINGS)
+    assert h.state == "degraded" and "no model loaded" in h.reason
+    assert h.detail["loaded_count"] is None
+
+
+@respx.mock
+async def test_omlx_non_object_json_body_is_reachable_unhealthy(svc):
+    respx.get("http://10.0.0.5:8000/health").mock(return_value=httpx.Response(200, json=["unexpected"]))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["omlx"], c, SETTINGS)
+    assert h.state == "reachable-unhealthy" and "not an object" in h.reason
+
+
+@respx.mock
 async def test_generic_http_500_is_reachable_unhealthy(svc):
     respx.get("http://ember-dashboard:3001/").mock(return_value=httpx.Response(500))
     async with httpx.AsyncClient() as c:
