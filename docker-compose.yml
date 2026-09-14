@@ -52,7 +52,10 @@ services:
     environment:
       LITELLM_BASE_URL: http://litellm:4000
       EMBER_SERVICES_DIR: /app/services
-    volumes: ["./services:/app/services:ro"]
+      EMBER_LITELLM_TEMPLATE: /app/config/litellm/ember.yaml.tmpl
+    volumes:
+      - ./services:/app/services:ro
+      - ./config/litellm/ember.yaml.tmpl:/app/config/litellm/ember.yaml.tmpl:ro
     ports: ["${BIND_ADDRESS:-127.0.0.1}:${EMBER_API_PORT:-3002}:3002"]
     deploy: { resources: { limits: { memory: 256M } } }
     <<: *logging

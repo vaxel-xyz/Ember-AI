@@ -30,6 +30,24 @@ def test_render_substitutes_all_placeholders_and_is_valid_yaml():
     assert "${" not in render_config.render(TMPL, ENV)
 
 
+def test_non_chat_aliases_declare_their_mode():
+    """Without model_info.mode LiteLLM's deep health check falls back to a chat completion,
+
+    which is what let the poll loop thrash the mini (see the C1 fix). Defence in depth:
+    even an accidental deep check now hits the right endpoint per alias.
+    """
+    out = yaml.safe_load(render_config.render(TMPL, ENV))
+    modes = {m["model_name"]: m.get("model_info", {}).get("mode") for m in out["model_list"]}
+    assert modes["ember-embed"] == "embedding"
+    assert modes["ember-rerank"] == "rerank"
+    assert modes["ember-stt"] == "audio_transcription"
+    assert modes["ember-tts"] == "audio_speech"
+    tts = next(m for m in out["model_list"] if m["model_name"] == "ember-tts")
+    assert tts["model_info"]["health_check_voice"] == "af_heart"
+    for chat in ("ember-auto", "ember-local", "ember-fast", "ember-code", "ember-vision", "ember-think"):
+        assert modes[chat] is None, f"{chat} is a chat route; it needs no explicit mode"
+
+
 def test_render_fails_loudly_on_missing_variable():
     with pytest.raises(KeyError, match="OMLX_TTS_MODEL"):
         render_config.render(TMPL, {k: v for k, v in ENV.items() if k != "OMLX_TTS_MODEL"})
