@@ -94,7 +94,7 @@
           "type": "boolean",
           "description": "True when a host-systemd service has an equivalent macOS LaunchAgent and should remain in the Apple service registry."
         },
-        "type": { "type": "string", "enum": ["docker", "host-systemd"] },
+        "type": { "type": "string", "enum": ["docker", "external"] },
         "startup_check": {
           "type": "boolean",
           "description": "When false, skip the post-install running-state poll and treat compose's clean exit as success. Set this on one-shot CLI / setup-only extensions whose containers intentionally exit (default: true)."
@@ -202,55 +202,21 @@
             "post_uninstall": { "type": "string" }
           },
           "additionalProperties": false
+        },
+        "x_ember": {
+          "type": "object",
+          "required": ["node", "role", "managed"],
+          "properties": {
+            "node": { "type": "string", "enum": ["docker01", "jons-mac-mini"] },
+            "role": { "type": "string", "enum": ["gateway", "control", "inference", "storage", "observability"] },
+            "managed": { "type": "boolean" },
+            "capabilities": { "type": "array", "items": { "type": "string", "enum": ["llm", "vision", "embeddings", "rerank", "stt", "tts"] } },
+            "health_probe": { "type": "string", "enum": ["http", "omlx", "litellm", "postgres"], "default": "http" }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": true
-    },
-    "features": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "name", "description", "icon", "category", "requirements", "priority"],
-        "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-          "name": { "type": "string", "minLength": 1 },
-          "description": { "type": "string", "minLength": 1 },
-          "icon": { "type": "string", "minLength": 1 },
-          "category": { "type": "string", "minLength": 1 },
-          "requirements": {
-            "type": "object",
-            "properties": {
-              "services": { "type": "array", "items": { "type": "string" } },
-              "services_any": { "type": "array", "items": { "type": "string" } },
-              "vram_gb": { "type": "number", "minimum": 0 },
-              "vram_mb": { "type": "number", "minimum": 0 },
-              "disk_gb": { "type": "number", "minimum": 0 }
-            },
-            "additionalProperties": true
-          },
-          "enabled_services_all": { "type": "array", "items": { "type": "string" } },
-          "enabled_services_any": { "type": "array", "items": { "type": "string" } },
-          "setup_time": { "type": "string" },
-          "priority": { "type": "integer", "minimum": 1 },
-          "launch": {
-            "type": "object",
-            "description": "Dashboard feature-card launch target. Use type=service for user-facing service UIs, internal for dashboard routes, and none for backend/API-only features.",
-            "required": ["type"],
-            "properties": {
-              "type": { "type": "string", "enum": ["service", "internal", "none"] },
-              "service": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-              "path": { "type": "string", "pattern": "^/.*" }
-            },
-            "additionalProperties": false
-          },
-          "gpu_backends": {
-            "type": "array",
-            "items": { "type": "string", "enum": ["amd", "nvidia", "apple", "cpu", "none", "all"] },
-            "minItems": 1
-          }
-        },
-        "additionalProperties": true
-      }
     },
     "tags": {
       "type": "array",
