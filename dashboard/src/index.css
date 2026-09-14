@@ -4,7 +4,7 @@
 
 /* ── Theme Variables ────────────────────────────────────── */
 
-/* ODS — default dark theme with indigo accents */
+/* Default dark theme with indigo accents */
 :root, :root[data-theme="ods"] {
   --theme-bg: 15 15 19;
   --theme-card: 24 24 27;

@@ -1,7 +1,7 @@
 {
-  "name": "ods-dashboard",
+  "name": "ember-dashboard",
   "version": "0.1.0",
-  "description": "ODS Dashboard - The control center for your local AI",
+  "description": "Ember AI — infrastructure dashboard",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -3,21 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="ODS Dashboard - Control your local AI" />
-    <title>ODS</title>
-    <link rel="icon" type="image/svg+xml" href="/osmantic-os.svg" />
-    <link rel="alternate icon" type="image/x-icon" href="/osmantic-os.ico" />
+    <meta name="description" content="Ember AI — shared inference infrastructure dashboard" />
+    <title>Ember AI</title>
+    <link rel="icon" type="image/svg+xml" href="/ember-logo.svg" />
 
-    <!-- PWA manifest — makes the dashboard installable as "ODS" on phone home screens -->
-    <link rel="manifest" href="/manifest.webmanifest?v=os-20260627" />
     <meta name="theme-color" content="#0f0f13" />
 
     <!-- iOS PWA support: "Add to Home Screen" → standalone mode with custom icon and title -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="ODS" />
-    <link rel="apple-touch-icon" href="/osmantic-os-icon-192.png" />
+    <meta name="apple-mobile-web-app-title" content="Ember AI" />
+    <link rel="apple-touch-icon" href="/ember-logo.svg" />
     <script>
       // Prevent flash of wrong theme — runs before React
       (function() {
@@ -61,25 +58,10 @@
   <body>
     <div id="root">
       <div class="loading-screen">
-        <div class="loading-logo">ODS</div>
-        <div>Loading ODS...</div>
+        <div class="loading-logo">Ember AI</div>
+        <div>Loading Ember AI...</div>
       </div>
     </div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-      // Register the PWA service worker after the page loads so it doesn't
-      // delay first paint. Only registers over secure contexts (HTTPS or
-      // localhost) — browsers refuse to register SWs from plain HTTP on a
-      // LAN IP, which is fine because the PWA-install affordance is also
-      // gated on a secure context.
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/sw.js').catch(function () {
-            // Silent: SW registration failure just means no PWA install
-            // prompt — the dashboard works the same either way.
-          });
-        });
-      }
-    </script>
   </body>
 </html>

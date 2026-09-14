@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 const STORAGE_KEY = 'ods-theme'
 const THEMES = ['ods', 'lemonade', 'light', 'arctic']
 const THEME_LABELS = {
-  ods: 'ODS',
+  ods: 'Dark',
   lemonade: 'Lemonade',
   light: 'Light',
   arctic: 'Arctic'
