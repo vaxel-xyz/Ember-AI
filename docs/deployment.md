@@ -113,3 +113,27 @@ Task 12 (Phase 1 foundation) live deployment to Docker01, validated against oMLX
 | Mini-off drill | `omlx stop` issued 18:01:30 UTC. By 18:02:14 UTC (44s later) `/api/services` showed `omlx: unreachable`, `litellm: degraded` (9/9 deployments unhealthy), dashboard and ember-api still serving HTTP 200 throughout. `omlx start` issued 18:02:20 UTC; oMLX `/health` returned 200 by 18:02:30 UTC (~10s); dashboard's poll reflected `omlx: healthy` by 18:03:17 UTC (~57s after start, gated by `EMBER_POLL_INTERVAL_S=15`). `litellm` returned to its pre-drill baseline `degraded` state (6/9 unhealthy — the same set as before the drill, caused by LiteLLM's generic health probe not suiting embed/vision/audio deployment types, not an actual functional problem — chat/embed/stt/tts all passed functional tests independently) after one real chat request. `omlx stop`/`start` both reported managing the server directly; no deviation to `omlx restart` was needed. |
 
 Secrets: `OMLX_API_KEY` was piped mini→Docker01 without appearing in any transcript, log, or file under version control. `LITELLM_MASTER_KEY`, `EMBER_API_KEY`, `LITELLM_DB_PASSWORD`, `QDRANT_API_KEY` were generated on Docker01 with `openssl rand -hex`. `OPENROUTER_API_KEY` remains `CHANGE_ME` on Docker01 pending Jon supplying it. No secret value appears in this document, in git history, or in this task's report.
+
+#### Mini-off drill — raw capture (controller re-run, 18:21–18:24 UTC)
+
+The controller independently re-ran the mini-off drill against the live Docker01 stack to
+corroborate the prose row above with raw samples. The first re-run attempt saw `omlx stop`
+take no effect within 60 s (oMLX stayed healthy) and was abandoned; the capture below is the
+repeated attempt, which behaved as expected. Times are UTC; "dashboard HTTP" is the
+`/api/services` response code where a poll snapshot exists at that instant.
+
+| Time | oMLX state | LiteLLM state | Dashboard HTTP | Note |
+|---|---|---|---|---|
+| 18:21:02 | `healthy` (2 model(s) resident) | `degraded` | 200 | baseline, pre-drill |
+| 18:21:25 | — | `degraded` | — | `omlx stop` issued; command returned "oMLX stopped" |
+| 18:21:39 | mini `/health` unreachable (curl code `000000`) | — | — | first unreachable probe sample, ~14 s after stop |
+| 18:22:13 | mini `/health` unreachable (`000000`) | — | — | mid-outage sample |
+| 18:23:03 | mini `/health` unreachable (`000000`) | — | — | mid-outage sample |
+| 18:23:27 | `unreachable` (timeout after 5s) | `degraded` | 200 | `/api/services` catches up ~5 s after the mini's `/health` died; `omlx start` issued at the same instant |
+| 18:24:40 | `healthy` (1 model(s) resident) | `degraded` | 200 | recovery sample, oMLX back ~54 s after `omlx start` per drill log |
+
+Consistent with the Task 12 receipt row above: `ember-api`/`ember-dashboard` stayed on HTTP 200
+throughout, `litellm` held its baseline `degraded` state independent of the oMLX outage, and
+`qdrant` remained `unreachable` throughout (profile off) — omitted from the table as unchanged.
+Raw JSON: `drill-raw-182124.json` (workspace file, not committed — git-ignored under
+`.superpowers/`).
