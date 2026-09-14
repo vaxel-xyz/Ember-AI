@@ -6,12 +6,15 @@ const NODES = [
   { id: 'jons-mac-mini', title: 'Inference node · jons-mac-mini' },
 ]
 
+const SAFE_URL_SCHEME = /^https?:\/\//i
+
 function ServiceRow({ s }) {
   const mem = s.detail?.memory_ceiling_gb ? `${s.detail.memory_used_gb} / ${s.detail.memory_ceiling_gb} GB` : null
+  const hasSafeUrl = Boolean(s.ui_url) && SAFE_URL_SCHEME.test(s.ui_url)
   return (
     <div className="flex items-center justify-between rounded-lg border border-theme-border bg-theme-card px-4 py-3">
       <div>
-        <div className="font-medium text-theme-text">{s.ui_url ? <a href={s.ui_url} target="_blank" rel="noreferrer" className="hover:underline">{s.name}</a> : s.name}</div>
+        <div className="font-medium text-theme-text">{hasSafeUrl ? <a href={s.ui_url} target="_blank" rel="noreferrer" className="hover:underline">{s.name}</a> : s.name}</div>
         <div className="text-xs text-theme-text-muted">{s.reason}{mem ? ` · ${mem}` : ''}{s.latency_ms ? ` · ${s.latency_ms} ms` : ''}</div>
       </div>
       <StatusBadge state={s.state} reason={s.reason} />

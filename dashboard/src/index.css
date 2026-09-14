@@ -611,42 +611,6 @@ a, button, input, select, textarea,
     0 0 10px rgba(239, 68, 68, 0.18);
 }
 
-.osmantic-logo {
-  display: block;
-  width: min(100%, 214px);
-  height: auto;
-  max-height: 68px;
-  margin: 0;
-  object-fit: contain;
-  object-position: left center;
-  filter:
-    drop-shadow(0 0 10px color-mix(in srgb, var(--sidebar-accent) 32%, transparent))
-    drop-shadow(0 0 2px rgba(246, 240, 255, 0.28));
-}
-
-.osmantic-logo-tile {
-  display: flex;
-  height: 44px;
-  width: 44px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--sidebar-accent-soft) 24%, transparent);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--sidebar-accent) 18%, transparent),
-    color-mix(in srgb, var(--sidebar-accent) 6%, transparent)
-  );
-}
-
-.osmantic-logo--compact {
-  width: 34px;
-  height: 34px;
-  max-height: none;
-  object-fit: contain;
-  object-position: center;
-}
-
 .liquid-metal-sequence-grid {
   --liquid-sequence-step: 3.4s;
 }
@@ -721,8 +685,7 @@ a, button, input, select, textarea,
   .liquid-metal-frame,
   .liquid-metal-nav,
   .liquid-metal-button,
-  .liquid-metal-progress-fill,
-  .osmantic-logo {
+  .liquid-metal-progress-fill {
     animation: none !important;
     will-change: auto !important;
   }
