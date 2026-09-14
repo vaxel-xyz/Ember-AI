@@ -2,14 +2,16 @@
 
 ## Secrets
 
-No secrets are committed to git. `.env.example` lists every variable the stack needs,
+No secrets are committed to git. `.env.example` lists every variable the Phase 1 stack needs,
 including: `OMLX_HOST`, `OMLX_BASE_URL`, `OMLX_API_KEY`, `OMLX_*_MODEL`,
 `OPENROUTER_API_KEY`, `LITELLM_MASTER_KEY`, `LITELLM_DB_PASSWORD`, `EMBER_API_KEY`,
-`QDRANT_API_KEY`, `LITELLM_TURN_OFF_MESSAGE_LOGGING`, plus the Phase 3+ `LANGFUSE_*`,
-`EMBER_LOG_PROMPTS`, `EMBER_CLOUD_FALLBACK` and `EMBER_ALLOW_MODEL_CONTROL` toggles. A
-`gitleaks` pre-commit hook (`.gitleaks.toml`, `.pre-commit-config.yaml`) runs on every commit;
-`.env.example`'s placeholder values are explicitly allowlisted so the hook does not flag its
-own template.
+`QDRANT_API_KEY` and `LITELLM_TURN_OFF_MESSAGE_LOGGING`. `LANGFUSE_*`, `EMBER_LOG_PROMPTS`,
+`EMBER_CLOUD_FALLBACK` and `EMBER_ALLOW_MODEL_CONTROL` are planned for later phases
+(observability, cloud fallback, gated model control) and are **not present in
+`.env.example`, `.env.schema.json` or the code yet** — verify with `git show
+HEAD:.env.example` before assuming otherwise. A `gitleaks` pre-commit hook
+(`.gitleaks.toml`, `.pre-commit-config.yaml`) runs on every commit; `.env.example`'s
+placeholder values are explicitly allowlisted so the hook does not flag its own template.
 
 ## Network exposure
 

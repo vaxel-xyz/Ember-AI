@@ -48,7 +48,8 @@ access to anything Docker- or host-level.
 `ember-api` cannot answer questions that require the Docker socket (e.g. container resource
 usage independent of what a service's own health endpoint reports, or arbitrary container
 start/stop). This is accepted: Phase 1's one gated exception,
-`POST /api/models/{id}/load|unload` against oMLX's own admin API, is explicitly deferred
-behind `EMBER_ALLOW_MODEL_CONTROL=true` and Phase 3, not built as part of this ADR. Any future
+`POST /api/models/{id}/load|unload` against oMLX's own admin API, is explicitly deferred to
+Phase 3, planned to sit behind an `EMBER_ALLOW_MODEL_CONTROL=true` gate — that variable does
+not exist in `.env.example` or the code yet — and is not built as part of this ADR. Any future
 requirement for genuine container lifecycle control would need a new, separately-scoped
 decision — it is not something `ember-api`'s current design accommodates by accident.

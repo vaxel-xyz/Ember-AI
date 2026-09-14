@@ -7,7 +7,7 @@
 ## Context
 
 Hermes is Ember's only required first-class consumer (spec §1.1,
-[ADR 0001](0001-vaxel-service-urls-ownership-network.md) §6) and is already a working,
+[ADR 0001](0001-vaxel-service-urls-ownership-network.md) §2) and is already a working,
 in-production agent on `jons-mac-mini`, talking to OpenRouter as its primary provider and to
 oMLX directly (`local-omlx` → `http://127.0.0.1:8000/v1`) as its fallback. Ember-AI's control
 plane (LiteLLM, ember-api, dashboard) is new and unproven on Docker01. Pointing Hermes at

@@ -12,8 +12,8 @@ GPU detection, GGUF directory scanning). oMLX runs on `jons-mac-mini`, which has
 all — it is a launchd-managed DMG app, entirely outside Ember's deployment and lifecycle
 control, on a separate physical host reachable only over the LAN. Forcing oMLX into the
 Docker-managed service model would be a fiction: there is no container to inspect, no socket
-to call, and no agent process Ember is allowed to run on the mini
-([ADR 0001](0001-vaxel-service-urls-ownership-network.md) §4, §9 — "No Docker on the mini").
+to call, and no agent process Ember is allowed to run on the mini — per the design spec
+(environment facts, 2026-09-14): "No Docker on the mini."
 
 ## Decision
 

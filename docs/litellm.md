@@ -67,6 +67,7 @@ onto one or the other.
 `litellm_settings.turn_off_message_logging` is set from `LITELLM_TURN_OFF_MESSAGE_LOGGING`
 (default `true` in `.env.example`) — prompts and responses are **not** stored in spend logs by
 default, only metadata (model, tokens, latency, client). Setting it to `false` is an explicit
-opt-in, and Phase 3's Langfuse `success_callback` respects the same
-`EMBER_LOG_PROMPTS`/`turn_off_message_logging` setting — see
+opt-in. Phase 3's planned Langfuse `success_callback` is designed to respect the same
+`turn_off_message_logging` behaviour via a planned `EMBER_LOG_PROMPTS` toggle — that
+variable is not present in `.env.example` yet — see
 [`docs/observability.md`](observability.md).

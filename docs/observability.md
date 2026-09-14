@@ -16,17 +16,22 @@ into the Ember stack when it is enabled. It is gated on Docker01's RAM increase 
 [`docs/prox01.md`](prox01.md#ram-note) — since ClickHouse does not fit in the 3.8 GiB
 available today alongside n8n.
 
-When enabled:
+None of the variables below exist in `.env.example`, `.env.schema.json` or the code today —
+they are the planned Phase 3 design, not a present feature. Verify with `git show
+HEAD:.env.example` before assuming any of them are configurable yet. When Phase 3 lands, the
+plan is:
 
-- `LANGFUSE_ENABLED=true` makes the LiteLLM entrypoint append
+- `LANGFUSE_ENABLED=true` (planned) would make the LiteLLM entrypoint append
   `success_callback: ["langfuse"]` to the rendered config.
-- Prompt logging stays off by default: `EMBER_LOG_PROMPTS=false` (the current
-  `LITELLM_TURN_OFF_MESSAGE_LOGGING=true` default) means `turn_off_message_logging: true` is
-  set, so only metadata is sent to Langfuse, not prompt/response content.
-- Request correlation: LiteLLM returns `x-litellm-call-id` to clients; a client-supplied
-  `x-request-id` is forwarded as the Langfuse `trace_id` where supported.
+- Prompt logging would stay off by default: a planned `EMBER_LOG_PROMPTS=false` (mirroring
+  the current `LITELLM_TURN_OFF_MESSAGE_LOGGING=true` default) would keep
+  `turn_off_message_logging: true` set, so only metadata is sent to Langfuse, not
+  prompt/response content.
+- Request correlation: LiteLLM already returns `x-litellm-call-id` to clients today; a
+  client-supplied `x-request-id` would be forwarded as the Langfuse `trace_id` where
+  supported.
 - Hermes-side tracing (memory, tool calls, agent loops) is Hermes's own concern — Ember's
-  Langfuse project only sees the LiteLLM hop, not what Hermes does with the response.
+  Langfuse project would only see the LiteLLM hop, not what Hermes does with the response.
 
 ## Out of scope
 

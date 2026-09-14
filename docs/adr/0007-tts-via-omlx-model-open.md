@@ -22,7 +22,7 @@ test (`tools/tts-blind-test.py`) between Kokoro and Qwen3-TTS 0.6B, run on the m
 | Model | Resident memory | Latency per ~85-char sentence | Throughput |
 |---|---|---|---|
 | Kokoro-82M-bf16 | 0.34 GB | 0.36–0.44 s | ~200 chars/s |
-| Qwen3-TTS-12Hz-0.6B | 1.90 GB | 3.7–5.0 s (≈ real-time) | ~19 chars/s |
+| Qwen3-TTS-12Hz-0.6B | 1.90 GB | 3.7–5.0 s | ~19 chars/s (≈ real-time) |
 
 Both models served cleanly via `/v1/audio/speech` (WAV) — this was not a viability filter, both
 worked. The deciding factor was Jon's blind listening pass over 6 home-assistant-style

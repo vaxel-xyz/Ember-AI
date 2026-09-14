@@ -34,9 +34,12 @@ bin/ember up
 bin/ember doctor
 ```
 
-`bin/ember doctor` validates `.env` against `.env.schema.json`, checks the compose config
-renders, confirms oMLX and LiteLLM are reachable, and runs one real `ember-auto` completion
-and one `ember-embed` request. See [`docs/deployment.md`](docs/deployment.md) for the full
+`bin/ember doctor` checks that six required env vars are set (`OMLX_BASE_URL`,
+`OMLX_API_KEY`, `LITELLM_MASTER_KEY`, `EMBER_API_KEY`, `OMLX_CHAT_MODEL`,
+`OMLX_EMBED_MODEL`), that the compose config renders, that Qdrant (if running) has a real
+API key, that oMLX and LiteLLM are reachable, that ember-api is healthy, and runs one real
+`ember-auto` completion and one `ember-embed` request. See
+[`docs/deployment.md`](docs/deployment.md) for the full
 walkthrough, including STT/TTS validation and the mini-off drill.
 
 ## URLs

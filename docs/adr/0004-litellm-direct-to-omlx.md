@@ -10,9 +10,13 @@ ODS routes local inference through a model switchboard and a `remote_provider`/S
 abstraction, designed for a world where the inference host might be remote, might change, or
 might need traffic shaping between multiple candidate backends. Ember-AI has exactly one local
 inference host (`jons-mac-mini`, oMLX, on the same LAN as the Docker VM) and one cloud
-provider (OpenRouter). There is no fleet of interchangeable local backends to switch between,
-and Prox01-to-mini traffic is LAN hostname/IP, not Tailscale, not an SSH tunnel (per
-[ADR 0001](0001-vaxel-service-urls-ownership-network.md) §9).
+provider (OpenRouter). There is no fleet of interchangeable local backends to switch between.
+[ADR 0001](0001-vaxel-service-urls-ownership-network.md) §9 establishes that internal
+machine-to-machine traffic should prefer LAN/service networking over an unnecessary
+Cloudflare hairpin; building on that, Ember's own choice for Prox01-to-mini traffic is plain
+LAN hostname/IP — not Tailscale, not an SSH tunnel — since both are on the same private
+`172.20.142.0/24` network and neither adds anything a bearer key on that network doesn't
+already provide.
 
 ## Decision
 
