@@ -11,7 +11,7 @@ separate VM and is not touched by Ember.
 | Host | `root@172.20.142.7` |
 | OS | Debian 13, kernel 6.12 |
 | CPU | 4 vCPU |
-| RAM | 3.8 GiB today; raised to ≥ 8 GB in Proxmox, applies on next VM reboot |
+| RAM | 7.8 GiB (raised from 3.8 GiB in Proxmox; applied on the 2026-09-14 VM reboot) |
 | Swap | 4 G |
 | Free disk | 63 G |
 | Docker | 29.8.0 |
@@ -19,11 +19,12 @@ separate VM and is not touched by Ember.
 
 ## RAM note
 
-The Phase 1 stack (LiteLLM + Postgres + ember-api + ember-dashboard, ~1–1.5 GB) fits in the
-3.8 GiB available today. The Langfuse profile (Phase 3: ClickHouse + Postgres + Redis + MinIO
-+ worker, 7 containers) will not fit alongside n8n until the VM is rebooted onto the 8 GB
-allocation — the 8 GB change is set in Proxmox but only takes effect on the next reboot, so
-the observability profile stays disabled until then.
+The VM was rebooted onto its larger allocation on 2026-09-14 and now reports 7.8 GiB total.
+The Phase 1 stack (LiteLLM + Postgres + ember-api + ember-dashboard, ~1–1.5 GB) leaves roughly
+5.9 GiB available alongside the existing n8n (~900 MiB) and Portainer (~37 MiB) stacks, so the
+Langfuse profile (Phase 3: ClickHouse + Postgres + Redis + MinIO + worker, 7 containers) is no
+longer blocked on RAM. It stays disabled because Phase 3 has not started, not because it will
+not fit.
 
 ## Stacks convention
 

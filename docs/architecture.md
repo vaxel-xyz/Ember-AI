@@ -125,6 +125,11 @@ alias set in `ember-api/ember_api/aliases.py`. Neither call triggers inference. 
 `degraded` when `/model/info` fails or is missing aliases, `healthy` otherwise with
 `detail = {aliases_registered, aliases_expected, missing}`.
 
+Lesson from the Phase 1 final review (C1): a health probe that performs inference is not a
+health probe — polling LiteLLM `GET /health` every 15 s fired ~10 requests at the mini every
+~30 s, evicting resident models to admit a larger one (~300 evictions/hour, 676 failed
+completions) and reporting the node `unreachable` while it was up.
+
 LiteLLM's `GET /health` is a **deep** check — it performs a live call per deployment — so it
 is never in the poll loop. Run it on demand with
 `POST /api/services/refresh?deep=true` (same bearer as every other route), which returns

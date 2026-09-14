@@ -65,11 +65,13 @@ backing model is `.env`-driven (see `config/litellm/ember.yaml.tmpl`). Current m
 | `ember-vision` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
 | `ember-embed` | oMLX | `bge-m3-mlx-8bit` |
 | `ember-stt` | oMLX | `parakeet-tdt-0.6b-v3` |
+| `ember-rerank` | oMLX | `bge-reranker-v2-m3` |
 | `ember-tts` | oMLX | `Kokoro-82M-bf16` |
 | `ember-think` | OpenRouter | `z-ai/glm-5.3` |
 
-`ember-rerank` is not configured yet — `bge-m3` is an embedding model, not a reranker, and no
-`SequenceClassification` reranker is loaded in oMLX. Status tracked in
+`ember-rerank` routes through LiteLLM with the `jina_ai/` provider prefix, which matches the
+Cohere/Jina-shaped `/v1/rerank` oMLX serves; validated against the live stack with scores
+identical to a direct oMLX call. Rationale in
 [`docs/adr/0006-rerank-routing.md`](docs/adr/0006-rerank-routing.md).
 
 ## Documentation

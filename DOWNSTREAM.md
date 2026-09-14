@@ -19,7 +19,7 @@ installer + phases, `ods-cli`, host agent, model switchboard/router, remote-prov
 llama-server, Open WebUI, Hermes/hermes-proxy, n8n, APE, OpenClaw, SearXNG, Perplexica, brave-search, ComfyUI,
 TEI embeddings, Whisper, Kokoro containers, privacy-shield, token-spy, ods-proxy, Tailscale, OpenCode,
 extension library/templates, Tauri installer, all ODS docs, `.github/` (issue templates, dependabot config,
-AI-automation prompts/scripts — Task 11 recreates `.github/workflows/` from scratch).
+AI-automation prompts/scripts — `.github/workflows/` was recreated from scratch).
 
 ## Inherited history notes
 A LiveKit API key/secret committed to upstream at `archive/cookbook/voice-agent-framework/core/hvac-token-server.py` is a likely-real credential, not a placeholder, per upstream's own `SECURITY_AUDIT.md` (finding C1, commit `ce863df7a7`). The file no longer exists in Ember-AI's tree, but the blob remains reachable through inherited git history; it is allowlisted (with the same annotation) in `.gitleaks.toml` rather than purged, since rotation is the upstream account owner's call and a history rewrite is a separate decision.

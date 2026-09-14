@@ -12,9 +12,9 @@ this — no separate telemetry pipeline is needed for basic usage visibility.
 The `observability` compose profile is not part of the Phase 1 stack. Its donor compose
 fragment lives at [`docs/donor/langfuse-compose.yaml`](donor/langfuse-compose.yaml) (Langfuse
 web + worker + Postgres + ClickHouse + Redis + MinIO, pinned versions) and will be adapted
-into the Ember stack when it is enabled. It is gated on Docker01's RAM increase — see
-[`docs/prox01.md`](prox01.md#ram-note) — since ClickHouse does not fit in the 3.8 GiB
-available today alongside n8n.
+into the Ember stack when it is enabled. Docker01's RAM increase has landed — 7.8 GiB total,
+~5.9 GiB available with the Phase 1 stack up (see [`docs/prox01.md`](prox01.md#ram-note)) — so
+ClickHouse now fits alongside n8n. The profile stays disabled because Phase 3 has not started.
 
 None of the variables below exist in `.env.example`, `.env.schema.json` or the code today —
 they are the planned Phase 3 design, not a present feature. Verify with `git show

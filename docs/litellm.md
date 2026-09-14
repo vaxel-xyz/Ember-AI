@@ -29,13 +29,23 @@ one template, rendered once per container start.
 | `ember-code` | `openai/${OMLX_CODE_MODEL}` | `OMLX_CODE_MODEL` |
 | `ember-vision` | `openai/${OMLX_VISION_MODEL}` | `OMLX_VISION_MODEL` |
 | `ember-embed` | `openai/${OMLX_EMBED_MODEL}` | `OMLX_EMBED_MODEL` |
+| `ember-rerank` | `jina_ai/${OMLX_RERANK_MODEL}` | `OMLX_RERANK_MODEL` |
 | `ember-stt` | `openai/${OMLX_STT_MODEL}` | `OMLX_STT_MODEL` |
 | `ember-tts` | `openai/${OMLX_TTS_MODEL}` | `OMLX_TTS_MODEL` |
 | `ember-think` | `openrouter/${OPENROUTER_THINK_MODEL}` | `OPENROUTER_THINK_MODEL` |
 
 All oMLX-backed aliases share `api_base: ${OMLX_BASE_URL}/v1` and
-`api_key: os.environ/OMLX_API_KEY`. `ember-rerank` has no entry in the template yet — see
+`api_key: os.environ/OMLX_API_KEY`. `ember-rerank` is configured and routes through LiteLLM
+using the `jina_ai/` provider prefix — oMLX's `/v1/rerank` is Cohere/Jina-shaped, so no
+`cohere/` fallback and no ember-api proxy were needed; see
 [ADR 0006](adr/0006-rerank-routing.md).
+
+The non-chat aliases (`ember-embed`, `ember-rerank`, `ember-stt`, `ember-tts`) carry
+`model_info.mode` — `embedding`, `rerank`, `audio_transcription`, `audio_speech`
+respectively, the last with `health_check_voice: af_heart`. Without it LiteLLM's deep health
+check (`GET /health`) falls back to a chat completion against an embedding or audio model.
+That check is never run from ember-api's poll loop; see
+[`docs/troubleshooting.md`](troubleshooting.md#deep-gateway-check-on-demand).
 
 ## Virtual keys
 

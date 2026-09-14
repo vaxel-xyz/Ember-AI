@@ -130,7 +130,7 @@ repeated attempt, which behaved as expected. Times are UTC; "dashboard HTTP" is 
 | 18:22:13 | mini `/health` unreachable (`000000`) | — | — | mid-outage sample |
 | 18:23:03 | mini `/health` unreachable (`000000`) | — | — | mid-outage sample |
 | 18:23:27 | `unreachable` (timeout after 5s) | `degraded` | 200 | `/api/services` catches up ~5 s after the mini's `/health` died; `omlx start` issued at the same instant |
-| 18:24:40 | `healthy` (1 model(s) resident) | `degraded` | 200 | recovery sample, oMLX back ~54 s after `omlx start` per drill log |
+| 18:24:40 | `healthy` (1 model(s) resident) | `degraded` | 200 | recovery sample, taken ~73 s after `omlx start`; oMLX's own `/health` was back ~54 s after start per the drill log, so the extra ~19 s is the 15 s poll interval plus the 5 s sampling gap, not slower recovery |
 
 Consistent with the Task 12 receipt row above: `ember-api`/`ember-dashboard` stayed on HTTP 200
 throughout, `litellm` held its baseline `degraded` state independent of the oMLX outage, and

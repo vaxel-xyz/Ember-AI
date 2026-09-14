@@ -15,7 +15,7 @@ LiteLLM (`ember-*` aliases) or, for dashboard health, through ember-api's probe.
 | `POST /v1/chat/completions` | bearer, via LiteLLM | `ember-auto`, `ember-local`, `ember-fast`, `ember-code` |
 | `POST /v1/chat/completions` (vision) | bearer, via LiteLLM | `ember-vision` |
 | `POST /v1/embeddings` | bearer, via LiteLLM | `ember-embed` |
-| `POST /v1/rerank` | bearer; direct to oMLX only — not routed through LiteLLM yet ([ADR 0006](adr/0006-rerank-routing.md)) | `ember-rerank` |
+| `POST /v1/rerank` | bearer, via LiteLLM (`jina_ai/` provider prefix — the endpoint is Cohere/Jina-shaped; [ADR 0006](adr/0006-rerank-routing.md)) | `ember-rerank` |
 | `POST /v1/audio/transcriptions` | bearer, via LiteLLM | `ember-stt` |
 | `POST /v1/audio/speech` | bearer, via LiteLLM | `ember-tts` |
 | `GET /v1/audio/voices` | bearer | voice listing for TTS (ember-api) |
