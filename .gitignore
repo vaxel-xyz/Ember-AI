@@ -69,3 +69,17 @@ ods/.cache/
 archive/
 .claude/
 !.claude/commands/
+
+# ============================================
+# Ember-AI lean rebuild
+# ============================================
+.env
+.env.*
+!.env.example
+ember-api/.venv/
+ember-api/**/__pycache__/
+dashboard/node_modules/
+dashboard/dist/
+tests/.tmp/
+.superpowers/
+.venv/
