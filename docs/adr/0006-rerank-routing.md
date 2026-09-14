@@ -1,6 +1,6 @@
 # ADR 0006: Rerank routing
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-14
 **Project:** `vaxel-xyz/Ember-AI`
 
@@ -20,14 +20,33 @@ reranking is a category error, and oMLX's own guidance for the rerank endpoint i
 
 ## Decision
 
-`ember-rerank` is **not configured** in Phase 1. `config/litellm/ember.yaml.tmpl` has no
-`ember-rerank` entry, `.env.example` carries `OMLX_RERANK_MODEL` only as a commented-out
-placeholder with a note pointing at this ADR, and `services/omlx/manifest.yaml` lists
-`rerank` in `x_ember.capabilities` as an oMLX-supported capability class, not as something
-Ember currently routes to. Resolving whether `ember-rerank` routes through LiteLLM directly or
-through an `ember-api` proxy — and choosing/loading a `SequenceClassification` reranker model
-on the mini — is deferred to Task 12. This ADR's status stays **Proposed** until Task 12's
-probe result is recorded here.
+Task 12 (2026-09-14) resolved the two open questions:
+
+1. **Model**: `bge-reranker-v2-m3` (a genuine `SequenceClassification` reranker, not
+   `bge-m3-mlx-8bit`) is downloaded and loaded on `jons-mac-mini` as `OMLX_RERANK_MODEL`.
+   oMLX's `/v1/rerank` serves it directly and correctly: `POST /v1/rerank` with
+   `{"model":"bge-reranker-v2-m3","query":"when do bins go out","documents":["Bins go out
+   tonight.","Coffee is ready."],"top_n":1}` returns the correct top result with
+   `relevance_score: 0.408` (2.4 s cold, 0.04 s warm, 2.38 GB resident).
+2. **Routing**: `ember-rerank` **does route through LiteLLM**, contrary to this ADR's original
+   concern that LiteLLM's rerank passthrough was only partially compatible. Adding
+
+   ```yaml
+   - model_name: ember-rerank
+     litellm_params: {model: "jina_ai/${OMLX_RERANK_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+   ```
+
+   to `config/litellm/ember.yaml.tmpl` and restarting the stack was sufficient. `POST
+   /rerank` on LiteLLM with `{"model":"ember-rerank", ...}` returned HTTP 200 on the first
+   attempt, with a `relevance_score` identical to the direct oMLX call. The `jina_ai/`
+   provider prefix maps LiteLLM's rerank request shape onto oMLX's Cohere/Jina-compatible
+   `/v1/rerank` endpoint correctly; no `cohere/` prefix fallback was needed, and no
+   `ember-api` proxy was built.
+
+`OMLX_RERANK_MODEL=bge-reranker-v2-m3` is set in `.env.example`, `.env.schema.json`, and the
+Docker01 `.env`. The `("ember-rerank", "omlx", "OMLX_RERANK_MODEL")` alias was added to
+`ALIASES` in `ember-api/ember_api/routers/models.py` immediately after `ember-embed`, so
+`GET /api/models` and the dashboard's Models page now show `ember-rerank`.
 
 ## Alternatives
 
@@ -42,8 +61,9 @@ probe result is recorded here.
 
 ## Consequences
 
-`GET /api/models` and the dashboard's Models page will show no `ember-rerank` row until this
-ADR is updated. Any consumer needing reranking today must do so outside Ember (e.g. inside
-Hermes's own RAG logic), consistent with Ember's boundary of not owning RAG behaviour (spec
-§4.8). This ADR should be revisited — status changed to Accepted, decision section updated
-with the chosen routing path and the model loaded — once Task 12 completes.
+`GET /api/models` and the dashboard's Models page now show an `ember-rerank` row, resolved
+against `OMLX_RERANK_MODEL`. Consumers should call `POST /rerank` on LiteLLM with
+`{"model": "ember-rerank", ...}` using a virtual key (see `docs/litellm.md`), not the direct
+oMLX endpoint — the LiteLLM route is authenticated, load-balanced consistently with every
+other Ember model, and appears in spend logs/health checks. Ember still does not own RAG
+behaviour (spec §4.8); this ADR only covers the transport, not who calls it or when.
