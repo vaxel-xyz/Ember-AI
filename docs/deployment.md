@@ -137,3 +137,98 @@ throughout, `litellm` held its baseline `degraded` state independent of the oMLX
 `qdrant` remained `unreachable` throughout (profile off) — omitted from the table as unchanged.
 Raw JSON: `drill-raw-182124.json` (workspace file, not committed — git-ignored under
 `.superpowers/`).
+
+### Re-validation after final review (2026-09-14, 19:00–19:25 UTC)
+
+Branch `feature/ember-lean-rebuild` @ `977c50f12`, deployed with
+`git pull --ff-only && bin/ember up` on Docker01. Seven fix commits landed after the whole-branch
+review; the headline change is that the `/api/services` poll loop no longer calls LiteLLM
+`GET /health`, which performed a live inference call per deployment.
+
+| Field | Result |
+|---|---|
+| Containers | `ember-api` Up (healthy), `ember-dashboard` Up (healthy), `ember-litellm` Up (healthy), `ember-litellm-postgres` Up (healthy). `ember-api` and `ember-dashboard` images rebuilt; n8n and Portainer stacks untouched. |
+| `ember-litellm` restart | Required and easy to miss: `bin/ember up` leaves `litellm` running because its compose definition did not change, but `config/litellm/ember.yaml.tmpl` is rendered **at container start**. Until `docker compose restart litellm`, the new `model_info.mode` entries were absent from `/tmp/config.yaml`. |
+| `bin/ember doctor` | All checks passed — env vars, compose config, oMLX reachable (1 model loaded), LiteLLM readiness, ember-api health, real `ember-auto` completion, `ember-embed` vector length 1024. |
+| Gateway baseline | `healthy` — `10/10 aliases registered`, `detail = {"aliases_registered": 10, "aliases_expected": 10, "missing": []}` — with `OPENROUTER_API_KEY` still `CHANGE_ME`. Previously this read `degraded (6/9 unhealthy)` at rest. |
+| Dashboard links | `litellm` → `https://llm.vaxel.xyz/ui/` (was `.../v1/ui/`); `qdrant` → `http://172.20.142.7:6333/dashboard` (was `http://qdrant:6333/dashboard`); `omlx` → `https://omlx.vaxel.xyz/docs`; `ember-api` → `null` (opts out). |
+| Deep check endpoint | `POST /api/services/refresh?deep=true` returns LiteLLM's healthy/unhealthy endpoint lists; unauthenticated it returns 401. Shallow `POST /api/services/refresh` returns `{"deep": false}` and makes no `GET /health` call. |
+
+#### Churn stopped
+
+Quiet window 19:06:48–19:13:18 UTC, poll loop only, no deep checks:
+
+| Measurement | Count |
+|---|---|
+| `ember-litellm` `GET /health ` (the deep, inference-triggering route) | **0** |
+| `ember-litellm` `GET /health/readiness` | 36 (≈24 poll loop at 15 s + ≈12 container healthcheck at 30 s) |
+| `ember-litellm` `GET /model/info` | 24 — exactly one per 15 s poll |
+| `ember-api` `poll failed` log lines | 0 |
+| oMLX `~/.omlx/logs/server.log` lines of any kind, 20:06:00–20:14:00 BST | **0** — no evictions, no completions, no load refusals |
+
+oMLX activity by hour from `~/.omlx/logs/server.log` (BST; the poll loop's unauthenticated
+`GET /health` is not logged by oMLX, so an idle Ember contributes nothing):
+
+| Hour (BST) | Evictions | Chat completions | Load refusals |
+|---|---|---|---|
+| 09 | 1 | 3 | 0 |
+| 10 | 0 | 28 | 0 |
+| 11–16 | 4 | 1 | 0 |
+| 18 | 30 | 23 | 42 |
+| **19 (pre-fix loop running)** | **299** | **178** | **449** |
+| 20 (post-fix; all of it from three deliberate deep checks + `doctor`) | 18 | 12 | 18 |
+
+The 19:00 BST row is the C1 signature — ~300 evictions/hour caused by the poll loop asking
+LiteLLM to complete a chat request against every deployment, including a 12B model whose
+`projected memory 14.69GB would exceed the dynamic memory ceiling`.
+
+#### `model_info.mode` verified
+
+Same deep check, before and after `litellm` picked up the re-rendered config:
+
+| Deep check | Healthy | Unhealthy | Notes |
+|---|---|---|---|
+| Before restart (no `model_info`) | 3 | 7 | `bge-m3-mlx-8bit`, `parakeet-tdt-0.6b-v3` and `Kokoro-82M-bf16` all rejected with *"is not an LLM / chat model. Use /v1/embeddings"* (resp. `/v1/audio/transcriptions`, `/v1/audio/speech`) — the probe was sending chat completions to embedding and audio models. |
+| After restart (`model_info.mode` present) | 8 | 2 | Only `jina_ai/bge-reranker-v2-m3` (genuine memory ceiling at that instant: *"projected memory 11.71GB would exceed the dynamic memory ceiling 10.54GB"*) and `openrouter/z-ai/glm-5.3` (`OPENROUTER_API_KEY=CHANGE_ME`, expected). |
+
+#### Detection latency
+
+The poll loop's cadence is the thing C1 broke: `asyncio.gather` awaited the ~30 s
+`GET /health` call, so *every* state change inherited that delay — which is why the original
+drill measured 44 s to detect and 57–73 s to recover. Measured from 76 samples of
+`/api/services` at 5 s intervals, 19:15:47–19:22:06 UTC (raw rows on Docker01 at
+`/tmp/drill2.jsonl`, formatter at `/tmp/capfmt.py`):
+
+| Metric | Value |
+|---|---|
+| Distinct polls observed | 27 |
+| Poll interval | min 15 s, max 16 s, mean 15.0 s (`EMBER_POLL_INTERVAL_S=15`) |
+| oMLX `health_timeout` (manifest) | 5 s |
+| **Worst-case detection bound** | **16 s + 5 s = 21 s ≤ 25 s** |
+| `litellm` state across all 76 samples | `healthy (10/10 aliases registered)` — now independent of oMLX, where it previously flipped to `degraded (9/9 unhealthy)` whenever the mini went away |
+| `ember-api` / `ember-dashboard` HTTP across all 76 samples | 200 / 200 |
+
+#### Mini-off drill — not re-run (blocker on the mini)
+
+The drill could not be repeated, and the reason is a pre-existing condition on the mini, not
+a regression in this branch:
+
+- `~/.omlx/bin/omlx stop` prints `oMLX stopped` but port 8000 stays bound; `/health` kept
+  returning 200 for 80 s afterwards.
+- `osascript -e 'quit app "oMLX"'` also left `/health` at 200 for 35 s.
+- `~/.omlx/bin/omlx restart` refuses outright: `Port 8000 is in use by PID 66607`.
+
+`lsof` shows the listener is `omlx-server` **PID 66607, PPID 1**, started 19:02:21 BST — the
+instant the *previous* drill issued `omlx start`. That run left behind a detached, orphaned
+server which the oMLX CLI no longer manages, while `oMLX.app` (PID 79372, launchd label
+`application.app.omlx.64052047.64052054`) runs alongside it. The CLI's `stop`/`restart` act on
+the app's server, not on the orphan, so oMLX cannot be cycled by the documented path.
+
+**Action for Jon:** reap PID 66607 on the mini, confirm `oMLX.app` re-binds :8000 (or run
+`~/.omlx/bin/omlx start`), then re-run the drill. It was deliberately not reaped here: the mini
+is Hermes's fallback inference provider, and a kill that fails to come back leaves the node
+down. Two non-invasive substitutes were attempted and both were refused by local tooling
+policy — a self-cleaning `DOCKER-USER` DROP rule for oMLX:8000 on Docker01, and a throwaway
+`ember-api` container pointed at a stoppable `/health` stub on the compose network. The poll
+cadence table above is the substitute evidence for the ≤ 25 s claim; it bounds detection
+without needing the node down.
