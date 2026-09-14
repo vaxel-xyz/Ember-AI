@@ -2,8 +2,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 if ! command -v docker >/dev/null 2>&1; then echo "SKIP: docker not available"; exit 0; fi
-tmp=$(mktemp); trap 'rm -f "$tmp"' EXIT
+tmp=$(mktemp)
 sed 's/CHANGE_ME/placeholder/g' .env.example > "$tmp"
+created_env=0
+if [ ! -f .env ]; then cp "$tmp" .env; created_env=1; fi
+trap 'rm -f "$tmp"; [ "$created_env" = 1 ] && rm -f .env' EXIT
 docker compose --env-file "$tmp" config -q
 docker compose --env-file "$tmp" --profile qdrant config | grep -q "ember-qdrant"
 python3 - "$tmp" <<'EOF'
