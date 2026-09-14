@@ -73,6 +73,8 @@ services:
     container_name: ember-qdrant
     profiles: [qdrant]
     restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?QDRANT_API_KEY must be set when the qdrant profile is enabled}
     volumes: [qdrant-data:/qdrant/storage]
     ports: ["${BIND_ADDRESS:-127.0.0.1}:${QDRANT_PORT:-6333}:6333"]
     deploy: { resources: { limits: { memory: 1G } } }
