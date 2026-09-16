@@ -33,7 +33,7 @@ def get_settings() -> Settings:
         omlx_api_key=_req("OMLX_API_KEY"),
         litellm_base_url=os.environ.get("LITELLM_BASE_URL", "http://litellm:4000").rstrip("/"),
         litellm_master_key=_req("LITELLM_MASTER_KEY"),
-        llm_public_url=os.environ.get("LLM_PUBLIC_URL", "https://llm.vaxel.xyz/v1"),
+        llm_public_url=os.environ.get("LLM_PUBLIC_URL", "https://ai.vaxel.xyz/v1"),
         llm_internal_url=os.environ.get("LLM_INTERNAL_URL", "http://172.20.142.7:4000/v1"),
         poll_interval_s=int(os.environ.get("EMBER_POLL_INTERVAL_S", "15")),
     )

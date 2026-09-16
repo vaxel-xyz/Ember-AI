@@ -44,6 +44,6 @@ Portainer `:9443`.
 | 6333 | `qdrant` | `QDRANT_PORT`, profile `qdrant` only |
 
 These four ports were free on Docker01 before Ember was deployed. There is no `cloudflared`
-on Docker01 — the Cloudflare tunnel that fronts `llm.vaxel.xyz` and `ember.vaxel.xyz` runs on
+on Docker01 — the Cloudflare tunnel that fronts `ai.vaxel.xyz` and `ember.vaxel.xyz` runs on
 the Proxmox host itself and routes the whole `172.20.142.0/24` range. See
 [`docs/cloudflare.md`](cloudflare.md).

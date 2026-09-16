@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-14
 **Repo:** `vaxel-xyz/Ember-AI` (fork of `Osmantic/ODS`, upstream at `v2.6.0` / `21f4b3a64`)
-**Status:** Approved in chat 2026-09-14 (sections 1–8, dashboard approach A, STT via oMLX). Amended same day for Jon's "Vaxel Service URLs, Ownership and Network Architecture" ADR: gateway = `llm.vaxel.xyz/v1`, dashboard = `ember.vaxel.xyz`, `ai.vaxel.xyz` = OpenWork (not Ember), aliases `ember-*`, TTS model under evaluation (not hard-coded Kokoro).
+**Status:** Approved in chat 2026-09-14 (sections 1–8, dashboard approach A, STT via oMLX). Amended same day for Jon's "Vaxel Service URLs, Ownership and Network Architecture" ADR: gateway = `ai.vaxel.xyz/v1`, dashboard = `ember.vaxel.xyz`, `ai.vaxel.xyz` = OpenWork (not Ember), aliases `ember-*`, TTS model under evaluation (not hard-coded Kokoro).
 
 ### Canonical public namespace (from ADR)
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | `https://ai.vaxel.xyz` | OpenWork / Vaxel human UI → Hermes | no — **never** a raw inference endpoint |
 | `https://ember.vaxel.xyz` | Ember-AI admin dashboard | yes |
-| `https://llm.vaxel.xyz/v1` | LiteLLM OpenAI-compatible gateway | yes |
+| `https://ai.vaxel.xyz/v1` | LiteLLM OpenAI-compatible gateway | yes |
 | `https://omlx.vaxel.xyz` | oMLX direct admin/API | no (existing) |
 | `https://hermes-dashboard.vaxel.xyz` | Hermes | no (existing) |
 | `https://n8n.vaxel.xyz`, `n8n-mcp.vaxel.xyz`, `portainer.vaxel.xyz` | existing | no |
@@ -63,7 +63,7 @@ ODS is a **donor/reference implementation**, not an architecture to preserve. Le
 **Docker01** (`root@172.20.142.7`, Debian 13, kernel 6.12, 4 vCPU, **3.8 GiB RAM**, 4 G swap, 63 G free disk, Docker 29.8.0, Compose v5.5.1):
 - Stacks convention: `/opt/stacks/<name>/compose.yml` (n8n, portainer). Ember deploys to `/opt/stacks/ember/`.
 - Running: n8n 2.38.5 (+worker, runners, Postgres 18, Redis), n8n-mcp on host `:3000`, Portainer `:9443`. Host ports 3001, 3002, 4000, 6333 free.
-- No cloudflared here. **Cloudflare tunnel runs on the Proxmox host** and routes the `172.20.142.0/24` range; `llm.vaxel.xyz` becomes a public-hostname rule there → `http://172.20.142.7:4000`; `ember.vaxel.xyz` → `:3001`.
+- No cloudflared here. **Cloudflare tunnel runs on the Proxmox host** and routes the `172.20.142.0/24` range; `ai.vaxel.xyz` becomes a public-hostname rule there → `http://172.20.142.7:4000`; `ember.vaxel.xyz` → `:3001`.
 
 ### 2.2 Prerequisites arising (need Jon's action / approval)
 
@@ -73,7 +73,7 @@ ODS is a **donor/reference implementation**, not an architecture to preserve. Le
 | P2 | ~~Download one embedding model~~ **DONE** — `mlx-community/bge-m3-mlx-8bit` on the mini, registered in oMLX, probed: 1024 dims, 0.05 s first call, 0.07 s for 8 texts | `ember-embed` acceptance criterion | done |
 | P3 | ~~Download the TTS model~~ **DONE** — `Kokoro-82M-bf16` chosen by blind A/B and registered in oMLX (Qwen3-TTS 0.6B also on disk, unloaded) | `ember-tts` | done |
 | P4 | ~~Raise Docker01 VM RAM to ≥ 8 GB~~ **DONE — rebooted 2026-09-14, 7.8 GiB total, 6.5 GiB available** | Langfuse stack (ClickHouse) will not fit in 3.8 GiB alongside n8n; Phase 1 stack (~1–1.5 GB) fits today | before Phase 3 |
-| P5 | Cloudflare: add `llm.vaxel.xyz → http://172.20.142.7:4000` on the Proxmox tunnel | public gateway endpoint | Phase 1 (LAN URL works without it) |
+| P5 | Cloudflare: add `ai.vaxel.xyz → http://172.20.142.7:4000` on the Proxmox tunnel | public gateway endpoint | Phase 1 (LAN URL works without it) |
 
 ---
 
@@ -83,7 +83,7 @@ ODS is a **donor/reference implementation**, not an architecture to preserve. Le
  consumers: Hermes | OpenCode | n8n | Home Assistant | voice satellites | OpenWork
         │   OpenAI-compatible HTTP, one LiteLLM virtual key per consumer
         ▼
- https://llm.vaxel.xyz/v1   (Cloudflare tunnel on Proxmox host → 172.20.142.7:4000; LAN clients use http://172.20.142.7:4000)
+ https://ai.vaxel.xyz/v1   (Cloudflare tunnel on Proxmox host → 172.20.142.7:4000; LAN clients use http://172.20.142.7:4000)
         ▼
  ┌──────────────────────── PROX01 · DOCKER VM · CONTROL PLANE ────────────────────────┐
  │  litellm (gateway, virtual keys, spend logs, Postgres)                              │
@@ -149,7 +149,7 @@ litellm_settings:
   # turn_off_message_logging: true   # when EMBER_LOG_PROMPTS=false (default false = prompts NOT logged)
 ```
 
-- `LLM_INTERNAL_URL` (`http://172.20.142.7:4000/v1`, LAN) and `LLM_PUBLIC_URL` (`https://llm.vaxel.xyz/v1`) are both surfaced by ember-api/dashboard; LAN consumers such as Hermes use the internal one (ADR §9, no Cloudflare hairpin).
+- `LLM_INTERNAL_URL` (`http://172.20.142.7:4000/v1`, LAN) and `LLM_PUBLIC_URL` (`https://ai.vaxel.xyz/v1`) are both surfaced by ember-api/dashboard; LAN consumers such as Hermes use the internal one (ADR §9, no Cloudflare hairpin).
 - Exact alias → model mapping stays configurable via `.env`; model IDs are whatever oMLX `/v1/models` reports (never invented).
 - **Verified 2026-09-14:** oMLX 0.6.4 serves `/v1/rerank` with raw `BAAI/bge-reranker-v2-m3` weights (id `bge-reranker-v2-m3`): correct ranking, 2.4 s cold / 0.04 s warm, **2.38 GB resident (fp32)** — heavy for the shared mini, so rely on LRU eviction and consider an 8-bit MLX conversion later.
 - `/v1/rerank` on oMLX is Cohere/Jina-shaped. LiteLLM's rerank route supports `openai`-style rerank passthrough only partially; the plan must verify whether `ember-rerank` can route through LiteLLM or whether ember-api exposes `/v1/rerank` as a thin authenticated proxy to oMLX. Either is acceptable; document the result in ADR 0006.
@@ -282,7 +282,7 @@ Ember-AI/
 
 ## 7. Cloudflare (documented, not automated)
 
-Tunnel lives on the **Proxmox host** (routes `172.20.142.0/24`); nothing cloudflared-related ships in the Ember stack. Required: public hostname `llm.vaxel.xyz → http://172.20.142.7:4000`. Optional `ember.vaxel.xyz → http://172.20.142.7:3001` behind a Cloudflare Access policy. `docs/cloudflare.md` gives the exact ingress fragment / dashboard steps. Existing `omlx.vaxel.xyz` and `hermes-dashboard.vaxel.xyz` (mini's own cloudflared) unchanged.
+Tunnel lives on the **Proxmox host** (routes `172.20.142.0/24`); nothing cloudflared-related ships in the Ember stack. Required: public hostname `ai.vaxel.xyz → http://172.20.142.7:4000`. Optional `ember.vaxel.xyz → http://172.20.142.7:3001` behind a Cloudflare Access policy. `docs/cloudflare.md` gives the exact ingress fragment / dashboard steps. Existing `omlx.vaxel.xyz` and `hermes-dashboard.vaxel.xyz` (mini's own cloudflared) unchanged.
 
 ## 8. Failure behaviour
 

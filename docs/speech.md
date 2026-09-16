@@ -49,7 +49,7 @@ model shapes are supported without a translation layer.
 
 ## Example requests
 
-Through LiteLLM (`$LLM` = `http://172.20.142.7:4000` or `https://llm.vaxel.xyz/v1`):
+Through LiteLLM (`$LLM` = `http://172.20.142.7:4000` or `https://ai.vaxel.xyz/v1`):
 
 ```bash
 # Transcription (ember-stt)

@@ -20,7 +20,7 @@ flowchart TB
 
     consumers -->|"OpenAI-compatible HTTP, one LiteLLM virtual key per consumer"| GW
 
-    GW["https://llm.vaxel.xyz/v1<br/>(Cloudflare tunnel on Proxmox host → 172.20.142.7:4000;<br/>LAN clients use http://172.20.142.7:4000)"]
+    GW["https://ai.vaxel.xyz/v1<br/>(Cloudflare tunnel on Proxmox host → 172.20.142.7:4000;<br/>LAN clients use http://172.20.142.7:4000)"]
 
     subgraph docker01["Prox01 · Docker VM · control plane"]
         LiteLLM["litellm (gateway, virtual keys, spend logs)"]
@@ -57,7 +57,7 @@ virtual keys and spend logs. Config is rendered at container start from
 mode files, no switchboard, no model-router. Each consumer gets its own virtual key with
 `metadata.client=<name>`; the dashboard's Clients view derives from `/spend/logs` and
 `/key/info`, so no bespoke per-consumer integration is needed. `LLM_INTERNAL_URL`
-(`http://172.20.142.7:4000/v1`) and `LLM_PUBLIC_URL` (`https://llm.vaxel.xyz/v1`) are both
+(`http://172.20.142.7:4000/v1`) and `LLM_PUBLIC_URL` (`https://ai.vaxel.xyz/v1`) are both
 surfaced by ember-api/dashboard; LAN consumers such as Hermes use the internal one. See
 [`docs/litellm.md`](litellm.md).
 

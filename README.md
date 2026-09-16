@@ -46,7 +46,7 @@ walkthrough, including STT/TTS validation and the mini-off drill.
 
 | URL | Service | Notes |
 |---|---|---|
-| `https://llm.vaxel.xyz/v1` | LiteLLM gateway | public, OpenAI-compatible; via Cloudflare tunnel on the Proxmox host → `http://172.20.142.7:4000` |
+| `https://ai.vaxel.xyz/v1` | LiteLLM gateway | public, OpenAI-compatible; via Cloudflare tunnel on the Proxmox host → `http://172.20.142.7:4000` |
 | `http://172.20.142.7:4000/v1` | LiteLLM gateway | LAN — used by LAN consumers such as Hermes (`LLM_INTERNAL_URL`), no Cloudflare hairpin |
 | `https://ember.vaxel.xyz` | Ember dashboard | optional, recommend Cloudflare Access; via the same tunnel → `http://172.20.142.7:3001` |
 | `https://ai.vaxel.xyz` | OpenWork / Vaxel human UI | **not an Ember endpoint** — reserved for OpenWork, never raw inference |

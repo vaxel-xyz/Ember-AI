@@ -10,7 +10,7 @@ LITELLM_TEMPLATE = ROOT / "config/litellm/ember.yaml.tmpl"
 def env():
     return {
         "EMBER_API_KEY": "test-key", "OMLX_HOST": "10.0.0.5", "OMLX_BASE_URL": "http://10.0.0.5:8000", "OMLX_API_KEY": "omlx-k",
-        "LITELLM_MASTER_KEY": "sk-master", "LLM_PUBLIC_URL": "https://llm.vaxel.xyz/v1", "LLM_INTERNAL_URL": "http://172.20.142.7:4000/v1",
+        "LITELLM_MASTER_KEY": "sk-master", "LLM_PUBLIC_URL": "https://ai.vaxel.xyz/v1", "LLM_INTERNAL_URL": "http://172.20.142.7:4000/v1",
         "OMLX_PUBLIC_URL": "https://omlx.vaxel.xyz", "EMBER_PUBLIC_URL": "https://ember.vaxel.xyz",
         "EMBER_LITELLM_TEMPLATE": str(LITELLM_TEMPLATE),
     }

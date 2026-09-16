@@ -41,7 +41,7 @@ restart Hermes — the only planned change to Hermes is the Phase 5 cutover, see
 
 `cloudflared` runs locally on the mini as a system daemon, publishing `omlx.vaxel.xyz` and
 `hermes-dashboard.vaxel.xyz`. This is separate from the Proxmox-host tunnel that fronts
-`llm.vaxel.xyz` and `ember.vaxel.xyz` — see [`docs/cloudflare.md`](cloudflare.md).
+`ai.vaxel.xyz` and `ember.vaxel.xyz` — see [`docs/cloudflare.md`](cloudflare.md).
 
 ## Memory guidance
 

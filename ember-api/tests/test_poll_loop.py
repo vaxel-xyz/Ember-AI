@@ -11,7 +11,7 @@ from ember_api.settings import Settings
 
 SETTINGS = Settings(ember_api_key="k", services_dir=None, omlx_base_url="http://10.0.0.5:8000", omlx_api_key="omlx-k",
                     litellm_base_url="http://litellm:4000", litellm_master_key="sk-master",
-                    llm_public_url="https://llm.vaxel.xyz/v1", llm_internal_url="http://172.20.142.7:4000/v1", poll_interval_s=15)
+                    llm_public_url="https://ai.vaxel.xyz/v1", llm_internal_url="http://172.20.142.7:4000/v1", poll_interval_s=15)
 
 
 @pytest.fixture

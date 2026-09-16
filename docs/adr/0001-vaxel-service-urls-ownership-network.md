@@ -4,6 +4,8 @@
 **Date:** 2026-09-14  
 **Project:** `vaxel-xyz/Ember-AI`
 
+**Superseded in part (2026-09-16):** §1 and §3 hostnames are superseded by [ADR 0010](0010-frontend-routing-voice.md) — the LLM gateway is `https://ai.vaxel.xyz/v1` and Open WebUI is the human frontend at `https://chat.vaxel.xyz`. All other sections stand.
+
 ## Context
 
 The Vaxel architecture has changed substantially from the original ODS-derived design.

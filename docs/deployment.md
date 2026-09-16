@@ -28,7 +28,7 @@ failure.
 ## Validation
 
 Run these once the stack is up and `bin/ember doctor` is green, using either the LAN URL
-(`http://172.20.142.7:4000`) or the public one (`https://llm.vaxel.xyz/v1`) as `$LLM`.
+(`http://172.20.142.7:4000`) or the public one (`https://ai.vaxel.xyz/v1`) as `$LLM`.
 
 **Chat completion (`ember-auto`):**
 
@@ -151,7 +151,7 @@ review; the headline change is that the `/api/services` poll loop no longer call
 | `ember-litellm` restart | Required and easy to miss: `bin/ember up` leaves `litellm` running because its compose definition did not change, but `config/litellm/ember.yaml.tmpl` is rendered **at container start**. Until `docker compose restart litellm`, the new `model_info.mode` entries were absent from `/tmp/config.yaml`. |
 | `bin/ember doctor` | All checks passed — env vars, compose config, oMLX reachable (1 model loaded), LiteLLM readiness, ember-api health, real `ember-auto` completion, `ember-embed` vector length 1024. |
 | Gateway baseline | `healthy` — `10/10 aliases registered`, `detail = {"aliases_registered": 10, "aliases_expected": 10, "missing": []}` — with `OPENROUTER_API_KEY` still `CHANGE_ME`. Previously this read `degraded (6/9 unhealthy)` at rest. |
-| Dashboard links | `litellm` → `https://llm.vaxel.xyz/ui/` (was `.../v1/ui/`); `qdrant` → `http://172.20.142.7:6333/dashboard` (was `http://qdrant:6333/dashboard`); `omlx` → `https://omlx.vaxel.xyz/docs`; `ember-api` → `null` (opts out). |
+| Dashboard links | `litellm` → `https://ai.vaxel.xyz/ui/` (was `.../v1/ui/`); `qdrant` → `http://172.20.142.7:6333/dashboard` (was `http://qdrant:6333/dashboard`); `omlx` → `https://omlx.vaxel.xyz/docs`; `ember-api` → `null` (opts out). |
 | Deep check endpoint | `POST /api/services/refresh?deep=true` returns LiteLLM's healthy/unhealthy endpoint lists; unauthenticated it returns 401. Shallow `POST /api/services/refresh` returns `{"deep": false}` and makes no `GET /health` call. |
 
 #### Churn stopped

@@ -71,7 +71,7 @@ client show up.
 | Variable | Value | Used by |
 |---|---|---|
 | `LLM_INTERNAL_URL` | `http://172.20.142.7:4000/v1` | LAN consumers (e.g. Hermes) — no Cloudflare hairpin |
-| `LLM_PUBLIC_URL` | `https://llm.vaxel.xyz/v1` | remote/public consumers, surfaced by `/api/providers` |
+| `LLM_PUBLIC_URL` | `https://ai.vaxel.xyz/v1` | remote/public consumers, surfaced by `/api/providers` |
 
 Both are surfaced by ember-api and the dashboard's Providers page; nothing forces a consumer
 onto one or the other.

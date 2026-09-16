@@ -48,7 +48,7 @@ def test_services_and_nodes(client):
     assert by_id["litellm"]["state"] == "unreachable"
     assert by_id["omlx"]["ui_url"] == "https://omlx.vaxel.xyz/docs"
     # LLM_PUBLIC_URL is the API root (.../v1); the LiteLLM UI sits beside it, not under it
-    assert by_id["litellm"]["ui_url"] == "https://llm.vaxel.xyz/ui/"
+    assert by_id["litellm"]["ui_url"] == "https://ai.vaxel.xyz/ui/"
     # qdrant has no public URL: the container hostname would not resolve in a browser
     assert by_id["qdrant"]["ui_url"] == "http://172.20.142.7:6333/dashboard"
     # ember-api sets external_link: false

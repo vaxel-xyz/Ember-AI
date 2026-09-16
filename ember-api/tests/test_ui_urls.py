@@ -7,7 +7,7 @@ from ember_api.settings import Settings
 
 SETTINGS = Settings(ember_api_key="k", services_dir=None, omlx_base_url="http://10.0.0.5:8000", omlx_api_key="omlx-k",
                     litellm_base_url="http://litellm:4000", litellm_master_key="sk-master",
-                    llm_public_url="https://llm.vaxel.xyz/v1", llm_internal_url="http://172.20.142.7:4000/v1", poll_interval_s=15)
+                    llm_public_url="https://ai.vaxel.xyz/v1", llm_internal_url="http://172.20.142.7:4000/v1", poll_interval_s=15)
 
 
 @pytest.fixture
@@ -16,8 +16,8 @@ def svc(services_dir, env):
 
 
 @pytest.mark.parametrize(("raw", "expected"), [
-    ("https://llm.vaxel.xyz/v1", "https://llm.vaxel.xyz"),
-    ("https://llm.vaxel.xyz/v1/", "https://llm.vaxel.xyz"),
+    ("https://ai.vaxel.xyz/v1", "https://ai.vaxel.xyz"),
+    ("https://ai.vaxel.xyz/v1/", "https://ai.vaxel.xyz"),
     ("https://omlx.vaxel.xyz", "https://omlx.vaxel.xyz"),
     ("https://ember.vaxel.xyz/", "https://ember.vaxel.xyz"),
     ("http://172.20.142.7:4000/v1", "http://172.20.142.7:4000"),
@@ -27,7 +27,7 @@ def test_strip_api_suffix(raw, expected):
 
 
 def test_gateway_ui_is_not_nested_under_v1(svc):
-    assert _ui_url(svc["litellm"], SETTINGS) == "https://llm.vaxel.xyz/ui/"
+    assert _ui_url(svc["litellm"], SETTINGS) == "https://ai.vaxel.xyz/ui/"
 
 
 def test_container_only_service_uses_the_lan_host_and_published_port(svc):

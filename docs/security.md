@@ -22,7 +22,7 @@ All control-plane ports bind to `${BIND_ADDRESS}` (default `0.0.0.0` on Docker01
 interface, kept off the public internet — the Cloudflare tunnel on the Proxmox host is the
 only public path in). Public exposure is Cloudflare-only:
 
-- `llm.vaxel.xyz` → `litellm:4000` — required, this is the public gateway.
+- `ai.vaxel.xyz` → `litellm:4000` — required, this is the public gateway.
 - `ember.vaxel.xyz` → `ember-dashboard:3001` — optional, recommended behind Cloudflare Access.
 - `ember-api`, `litellm-postgres` and Qdrant are never public.
 
