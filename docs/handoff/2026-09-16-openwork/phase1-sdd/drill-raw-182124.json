@@ -1,0 +1,41 @@
+{"drill":"mini-off raw capture (retry)","samples":[
+{"t": "18:21:25", "polled_at": "2026-09-14T18:21:02.380537+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident"}
+,{"event":"omlx stop issued 18:21:25", "stop_output": "oMLX stopped"}
+,{"mini_health_http":"000000","t":"18:21:39"}
+,{"mini_health_http":"000000","t":"18:21:49"}
+,{"mini_health_http":"000000","t":"18:22:03"}
+,{"mini_health_http":"000000","t":"18:22:13"}
+,{"mini_health_http":"000000","t":"18:22:22"}
+,{"mini_health_http":"000000","t":"18:22:30"}
+,{"mini_health_http":"000000","t":"18:22:38"}
+,{"mini_health_http":"000000","t":"18:22:46"}
+,{"mini_health_http":"000000","t":"18:22:55"}
+,{"mini_health_http":"000000","t":"18:23:03"}
+,{"mini_health_http":"000000","t":"18:23:12"}
+,{"mini_health_http":"000000","t":"18:23:22"}
+,
+{"t": "18:23:27", "polled_at": "2026-09-14T18:23:17.466434+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,{"event":"dashboard shows omlx unreachable 5 s after mini /health died"}
+,{"event":"omlx start issued 18:23:27"}
+,
+{"t": "18:23:52", "polled_at": "2026-09-14T18:23:17.466434+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:23:57", "polled_at": "2026-09-14T18:23:17.466434+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:02", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:08", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:13", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:19", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:24", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:29", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:35", "polled_at": "2026-09-14T18:24:02.495368+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "unreachable", "qdrant": "unreachable"}, "omlx_reason": "timeout after 5s"}
+,
+{"t": "18:24:40", "polled_at": "2026-09-14T18:24:39.941367+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident"}
+,{"event":"omlx back after 54 s"}
+]}

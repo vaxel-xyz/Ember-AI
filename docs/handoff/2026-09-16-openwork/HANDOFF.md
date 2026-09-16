@@ -15,8 +15,9 @@ Your job tonight = **branch 2**: apply Jon's "ADR: Ember Frontend, Routing and V
 | `SPEC.md` | branch-2 design (binding) |
 | `PLAN.md` | branch-2 tasks with exact code, tests, commands, acceptance |
 | `adr-0010-source.md` | Jon's ADR text, sanitised for the PUBLIC repo — copy verbatim into `docs/adr/0010-frontend-routing-voice.md` |
-| `SPEC-phase1-reference.md` | Phase 1 design spec (background only) |
-| `phase1-ledger.md` | Phase 1 build ledger: every ruling, deferred minor, and why |
+| `../../design/2026-09-14-phase1-design.md`, `../../design/2026-09-14-phase1-plan.md` | Phase 1 design + plan (background only) |
+| `phase1-sdd/` | Phase 1 build record: ledger (`progress.md`, rulings R1–R23), task briefs/reports, fix-wave report, PR body, drill captures |
+| `CONTEXT.md` | Environment facts, decisions, lessons carried from the Claude Code sessions |
 
 ## Hard rules (Jon's, not negotiable)
 1. **Repo is PUBLIC.** No secrets, no keys, no remote-access URLs (in particular never the Home Assistant Nabu Casa URL). Placeholders only in any `*.example`. gitleaks runs in CI.
