@@ -44,7 +44,7 @@ Edited `docs/deployment.md`, appending a new subsection immediately after the ex
 - Opening note: the controller's first re-run attempt saw `omlx stop` take no effect within
   60 s and was abandoned/repeated; the table reflects the successful repeat.
 - 7-row table (Time | oMLX state | LiteLLM state | Dashboard HTTP | Note), built from
-  `.superpowers/sdd/2026-09-14-ember-ai-phase1-foundation/drill-raw-182124.json`:
+  `docs/handoff/2026-09-16-openwork/phase1-sdd/drill-raw-182124.json`:
   1. `18:21:02` baseline `healthy` (2 resident), litellm `degraded`, dashboard 200
   2. `18:21:25` `omlx stop` issued
   3. `18:21:39` first unreachable probe (`000000`)
@@ -64,7 +64,7 @@ is git-ignored in this repo — verified with `git check-ignore -v`).
 
 ## PR body
 
-Written to `/Users/jtotham/Projects/Ember-AI/.superpowers/sdd/2026-09-14-ember-ai-phase1-foundation/pr-body.md`
+Written to `docs/handoff/2026-09-16-openwork/phase1-sdd/pr-body.md`
 (git-ignored workspace file, not part of the commit). Contains:
 - `## Summary` — 4 sentences per brief.
 - `## Acceptance (spec §11)` — all 9 criteria, all `- [x]` (Phase 1 scope fully met per the

@@ -1,6 +1,6 @@
-# SDD ledger — plan: /Users/jtotham/Projects/superpowers/plans/2026-09-14-ember-ai-phase1-foundation.md
+# SDD ledger — plan: docs/design/2026-09-14-phase1-plan.md
 
-Spec: /Users/jtotham/Projects/superpowers/specs/2026-09-14-ember-ai-design.md (read; binding authority).
+Spec: docs/design/2026-09-14-phase1-design.md (read; binding authority).
 Repo: /Users/jtotham/Projects/Ember-AI, start = main @ 21f4b3a64. Branch feature/ember-lean-rebuild created in Task 0.
 No worktree: the Ember-AI clone carries no other in-flight work; the feature branch is the isolation.
 
@@ -89,8 +89,8 @@ Task 12: implementer done — live stack up on Docker01; doctor green after enco
 Ruling R20: Task 12 — implementer applied a one-line LiteLLM fix (encoding_format: float on ember-embed) instead of stopping BLOCKED; fix verified minimal/correct, stack has no consumers yet, Jon authorised build-out changes → accepted retroactively, surfaced to Jon. — cost if wrong: Jon can revert 5225d722b.
 Task 12: minor (deferred): drill timings recorded as prose (controller re-capturing raw JSON); detection 44 s vs brief's informal 20 s (poll 15 s + timeout stacking); schema entry for OMLX_RERANK_MODEL added though optional.
 Task 12: complete (commits ba1c43b..c4aad46, review clean)
-Task 12: raw drill re-capture by controller → .superpowers/sdd/2026-09-14-ember-ai-phase1-foundation/drill-raw-182124.json: stop 18:21:25Z, mini /health 000 immediately, dashboard omlx=unreachable by 18:23:27Z (first sample after direct-check loop; ≤65 s), all snapshots HTTP 200, start 18:23:27Z, omlx healthy after 54 s. First attempt (181917.json) stop no-op'd within 60 s — noted.
-Task 13: complete (commit f8cc15d4e; suite ALL OK; CI green). All tasks 0–13 complete. Final review package: .superpowers/sdd/2026-09-14-ember-ai-phase1-foundation/review-final-branch.md
+Task 12: raw drill re-capture by controller → docs/handoff/2026-09-16-openwork/phase1-sdd/drill-raw-182124.json: stop 18:21:25Z, mini /health 000 immediately, dashboard omlx=unreachable by 18:23:27Z (first sample after direct-check loop; ≤65 s), all snapshots HTTP 200, start 18:23:27Z, omlx healthy after 54 s. First attempt (181917.json) stop no-op'd within 60 s — noted.
+Task 13: complete (commit f8cc15d4e; suite ALL OK; CI green). All tasks 0–13 complete. Final review package: docs/handoff/2026-09-16-openwork/phase1-sdd/review-final-branch.md
 FINAL REVIEW (fable, f8cc15d4e): NOT READY. C1 LiteLLM /health in poll loop = live inference per deployment, thrashing the mini (300 evictions/h, oMLX shown unreachable while up) — fails §11.1/§11.5. I1 poll loop dies on uncaught httpx.TransportError / engine_pool null. I2 gateway degraded on any unhealthy deployment (spec: zero healthy). I3 OMLX_RERANK_MODEL + LITELLM_TURN_OFF_MESSAGE_LOGGING load-bearing but not required/REQUIRED_ENV. I4 rerank docs stale. I5 ui_url wrong for LiteLLM (/v1/ui/) and Qdrant (container host). Minors triaged: fix-before-merge = engine_pool-null crash, poll-loop-survives test, use logger, delete orphaned donor html, gitleaks description; rest deferred.
 Ruling R21: controller stopped `ember-api` on Docker01 (docker compose stop) at ~19:45 UTC to end the inference churn immediately; LiteLLM/dashboard/postgres left running. — cost if wrong: dashboard blank until fix wave redeploys.
 Ruling R22: spec §4.4 amended — LiteLLM poll probe = readiness + /model/info; deep check on demand only; degraded = zero healthy deployments. Correction to Task 12 note: OMLX_RERANK_MODEL IS required (Template.substitute).

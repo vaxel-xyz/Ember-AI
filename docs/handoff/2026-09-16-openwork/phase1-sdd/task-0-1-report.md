@@ -20,7 +20,7 @@ No deviation. `origin` remained `https://github.com/vaxel-xyz/Ember-AI.git`.
   then `git mv` it to `docs/adr/0001-vaxel-service-urls-ownership-network.md`. This is the only path
   deviation in Task 0 and is mechanically necessary — no content change.
 - `docs/adr/0002-stt-parakeet-via-omlx.md` was created by copying
-  `/Users/jtotham/Projects/Ember-AI/.superpowers/sdd/2026-09-14-ember-ai-phase1-foundation/adr-0002-source.md`
+  `docs/handoff/2026-09-16-openwork/phase1-sdd/adr-0002-source.md`
   **verbatim**, per the controller decision. Title "Use Parakeet v3 via oMLX for Ember-AI Speech-to-Text",
   Status Accepted, Date 2026-09-14 — confirmed present in the source and preserved exactly. No
   reconstruction from spec was needed; the source file existed and was used directly.

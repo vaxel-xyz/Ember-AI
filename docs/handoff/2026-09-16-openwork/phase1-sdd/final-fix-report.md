@@ -3,7 +3,7 @@
 **Date:** 2026-09-14
 **Branch:** `feature/ember-lean-rebuild`
 **Start:** `f8cc15d4e` · **Final head:** `dc5659bf5` (pushed, CI green)
-**Spec:** `/Users/jtotham/Projects/superpowers/specs/2026-09-14-ember-ai-design.md` (§4.4 as amended)
+**Spec:** `docs/design/2026-09-14-phase1-design.md` (§4.4 as amended)
 **Live stack:** Docker01 `/opt/stacks/ember`, synced to `dc5659bf5`, all four containers healthy
 
 ## Commits
