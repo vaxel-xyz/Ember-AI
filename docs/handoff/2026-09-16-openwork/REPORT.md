@@ -27,3 +27,12 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - Docs: alias tables in `docs/litellm.md` + `README.md` gained the three rows.
 - Tests: 54 pytest (was 52) + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
 - Deviation: none.
+
+## Task 3 — Open WebUI as an external consumer tile
+- Commit: `feat: represent Open WebUI as an external consumer tile` (pushed; ci + secret-scan success).
+- Schema: `x_ember.role` enum += `consumer`. New `services/open-webui/manifest.yaml` exactly per PLAN (external, port 3003, `/health`, `public_url_env: CHAT_PUBLIC_URL`, node docker01, managed false).
+- `.env.example` += `OPENWEBUI_HOST`/`CHAT_PUBLIC_URL` block (python3 edit); `.env.schema.json` += both properties (string, not secret, not required).
+- `routers/services.py` `/api/nodes`: docker01 list excludes `role == "consumer"`; third group `consumers` added.
+- Dashboard `Overview.jsx`: `NODES` += Consumers; filter per PLAN. Test: `open-webui` mock service asserted under Consumers and absent from the control-plane section (`within()`).
+- Tests: first run caught `public_url` None — the conftest `env` fixture lacked `CHAT_PUBLIC_URL`; added `OPENWEBUI_HOST`/`CHAT_PUBLIC_URL` to the fixture (mirrors a configured deployment). 55 pytest + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
+- Deviation: none beyond the fixture fix above.

@@ -41,6 +41,10 @@ doctor() {
       -d '{"model":"ember-auto","messages":[{"role":"user","content":"Reply with the single word: pong"}],"max_tokens":8}'); then
     pass "ember-auto completion: $(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["choices"][0]["message"]["content"].strip()[:40])')"
   else fail "ember-auto completion failed"; fi
+  if out=$(curl -sf -m 300 "$lite/v1/chat/completions" -H "Authorization: Bearer $LITELLM_MASTER_KEY" -H 'Content-Type: application/json' \
+      -d '{"model":"local-smart","messages":[{"role":"user","content":"Reply with the single word: pong"}],"max_tokens":8}'); then
+    pass "local-smart completion: $(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["choices"][0]["message"]["content"].strip()[:40])')"
+  else fail "local-smart completion failed"; fi
   if out=$(curl -sf -m 120 "$lite/v1/embeddings" -H "Authorization: Bearer $LITELLM_MASTER_KEY" -H 'Content-Type: application/json' \
       -d '{"model":"ember-embed","input":"ember doctor"}'); then
     pass "ember-embed vector length $(printf '%s' "$out" | python3 -c 'import json,sys;print(len(json.load(sys.stdin)["data"][0]["embedding"]))')"
