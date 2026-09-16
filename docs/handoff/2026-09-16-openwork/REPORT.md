@@ -45,3 +45,39 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - `bin/ember doctor`: `local-smart` completion check added after the `ember-auto` block. `tests/test-doctor.sh` needed no change (its stub answers any chat POST, as the PLAN predicted).
 - Tests: 55 pytest + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
 - Deviation: none.
+
+## Task 5 — ADR 0010 + roadmap + ownership updates
+- Commit: `docs: ADR 0010 frontend/routing/voice; roadmap; ownership updates` (pushed; ci + secret-scan success).
+- `docs/adr/0010-frontend-routing-voice.md` = `adr-0010-source.md` copied verbatim (the source was already sanitised — the Nabu Casa redaction note is in the file itself; verified no URL present).
+- README four-way table: Human-facing UI = Open WebUI (`chat.vaxel.xyz`); OpenWork removed; MCP row added ("configured in Open WebUI / Hermes, never in ember-api"). URL table: `ai.vaxel.xyz` row replaced by `chat.vaxel.xyz`.
+- `docs/architecture.md`: consumers diagram OpenWork → Open WebUI; new "Open WebUI (external consumer)" section; `/api/nodes` and `bin/ember doctor` descriptions updated (consumers group, local-smart check).
+- `docs/roadmap.md` (new): ADR 0010 phases 5–7 + `auto` alias, each "not started", owner Jon.
+- Phase 1 design doc: amendment banner + ownership/URL rows updated (consistent with Task 1's treatment of that history doc).
+- Deviations from the PLAN's "grep OpenWork must return nothing" gate — remaining mentions are all intentional, none claim UI ownership:
+  - `docs/adr/0010` (Jon's verbatim supersession note — cannot be altered),
+  - `docs/adr/0003` line 15 (accepted ADR, historical context; rewriting accepted-ADR text would falsify the record),
+  - `docs/cloudflare.md` (the sentence PLAN Task 1 step 5 explicitly required),
+  - `AGENTS.md` (OpenWork listed as an agent *reader* of the repo, not a UI),
+  - `docs/design/2026-09-14-phase1-design.md` line 5 (the amendment note itself, explaining the change).
+- Tests: 55 pytest + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
+
+## Task 6 — live validation on Docker01
+- Receipt commit: `c9fdd18f` `docs: branch 2 validation receipt` (pushed; ci + secret-scan success). Branch head for the PR.
+- Ember `.env`: `LLM_PUBLIC_URL=https://ai.vaxel.xyz/v1`; `OPENWEBUI_HOST`/`CHAT_PUBLIC_URL` appended. `OMLX_RERANK_MODEL` was already present.
+- **Incident (fixed):** first `bin/ember doctor` after restart failed all oMLX-backed checks with 401 from oMLX itself. Cause: the mini's oMLX bearer key had been rotated since Phase 1 — the key in `/opt/stacks/ember/.env` no longer matched (verified by comparing SHA-256 fingerprints over ssh; values never printed). Fix: moved the current mini key to Docker01 `.env` via the `ssh mini | ssh docker` pipe (HANDOFF rule 8), `bin/ember restart`, doctor green. No key material in any log or commit.
+- `bin/ember doctor`: all checks passed, including the new `local-smart` completion.
+- `/model/info`: 13 aliases confirmed (list in `docs/deployment.md` receipt).
+- Virtual key: first `keys create open-webui` printed only the client line through my filter and the key value was lost; a same-alias retry 400s, so the orphaned key was deleted via LiteLLM `/key/delete` (token from `/key/list`) and a fresh key minted, captured to a remote shell var only. `CHANGE_ME` count in the stack `.env` after setup: 0.
+- Open WebUI: stack up from `deploy/openwebui/` at `/opt/stacks/openwebui`; container healthy; `:3003/health` → 200; `ENABLE_SIGNUP=true` left for Jon.
+- Ember view: `/api/services` shows `open-webui (healthy, consumer)`; `/api/nodes` shows `consumers: [open-webui]` and docker01 excludes it.
+- Virtual-key view: `/v1/models` → 13 aliases; `local-smart` completion via the virtual key → 200 with content.
+- Memory: 2.9 GiB used / 7.8 GiB; `open-webui` 1.17/1.5 GiB (watch this — closest to its limit); `ember-litellm` 426 MiB.
+- Deviations: the oMLX key rotation above (not in the plan; root-caused and fixed); the virtual-key capture redo (operator error, cleaned up via documented LiteLLM APIs).
+
+## Acceptance for the night
+- Tasks 1–6 commits pushed; `ci` + `secret-scan` green on final head `c9fdd18f`.
+- Local suite green: ember-api 55 pytest (≥ 56 target: 55 — see note), ruff clean; dashboard 4 tests; `tests/run.sh` ALL OK.
+  - Note: PLAN says "ember-api ≥ 56 tests"; final count is 55 (52 baseline + 3 new). The plan's arithmetic assumed one more test than the tasks actually specify (Task 2 adds 2, Task 3 adds 1 net after renaming). All planned assertions exist.
+- Docker01: doctor green; 13 aliases; `open-webui` healthy; dashboard consumer tile healthy.
+- No secret values in git, this report, or logs.
+- Draft PR #2: opened with this file as body (see PR URL printed by the session).
