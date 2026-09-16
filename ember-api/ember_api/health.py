@@ -102,6 +102,10 @@ async def _probe_litellm(service: Service, client: httpx.AsyncClient, settings: 
         return ServiceHealth(service.id, "reachable-unhealthy", f"readiness HTTP {r.status_code}", ms)
     try:
         info = await lite.model_info()
+    except httpx.HTTPStatusError as exc:
+        return ServiceHealth(
+            service.id, "degraded", f"readiness ok, /model/info failed: HTTP {exc.response.status_code}", ms
+        )
     except (httpx.HTTPError, ValueError) as exc:
         return ServiceHealth(service.id, "degraded", f"readiness ok, /model/info failed: {exc.__class__.__name__}", ms)
     registered = {m.get("model_name") for m in info if isinstance(m, dict)}

@@ -19,4 +19,7 @@ class LiteLLMClient:
     async def model_info(self, timeout: float = 10.0) -> list[dict]:
         r = await self._c.get(f"{self._base}/model/info", headers=self._auth(), timeout=timeout)
         r.raise_for_status()
-        return r.json().get("data", [])
+        body = r.json()
+        if not isinstance(body, dict):
+            raise ValueError("model_info: non-object body")  # noqa: TRY004 — caught as ValueError by _probe_litellm
+        return body.get("data", [])

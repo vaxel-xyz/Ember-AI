@@ -10,8 +10,11 @@ including: `OMLX_HOST`, `OMLX_BASE_URL`, `OMLX_API_KEY`, `OMLX_*_MODEL`,
 (observability, cloud fallback, gated model control) and are **not present in
 `.env.example`, `.env.schema.json` or the code yet** — verify with `git show
 HEAD:.env.example` before assuming otherwise. A `gitleaks` pre-commit hook
-(`.gitleaks.toml`, `.pre-commit-config.yaml`) runs on every commit; `.env.example`'s
-placeholder values are explicitly allowlisted so the hook does not flag its own template.
+(`.gitleaks.toml`, `.pre-commit-config.yaml`) runs on every commit against the full default
+ruleset (`[extend] useDefault = true`); `.env.example`'s placeholder values simply don't match
+any detector, so they pass without needing an allowlist entry. The only path allowlist in
+`.gitleaks.toml` is the annotated, inherited LiveKit key/secret pair — a real upstream
+disclosure in dead history, not a false positive.
 
 ## Network exposure
 

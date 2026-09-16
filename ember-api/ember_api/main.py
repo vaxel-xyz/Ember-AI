@@ -23,8 +23,18 @@ class Registry:
         self.polled_at: datetime | None = None
 
     async def poll_once(self) -> None:
-        results = await asyncio.gather(*(probe(s, self._http, self._settings) for s in self.services.values()))
-        self.health = {r.id: r for r in results}
+        services = list(self.services.values())
+        results = await asyncio.gather(
+            *(probe(s, self._http, self._settings) for s in services), return_exceptions=True
+        )
+        health: dict[str, ServiceHealth] = {}
+        for service, result in zip(services, results, strict=True):
+            if isinstance(result, Exception):
+                log.error("probe failed for %s: %r", service.id, result)
+                health[service.id] = ServiceHealth(service.id, "unreachable", f"probe error: {type(result).__name__}")
+            else:
+                health[service.id] = result
+        self.health = health
         self.polled_at = datetime.now(UTC)
 
     async def run(self, interval_s: int) -> None:

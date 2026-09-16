@@ -161,3 +161,23 @@ async def test_litellm_invalid_json_body_is_degraded(svc):
     async with httpx.AsyncClient() as c:
         h = await probe(svc["litellm"], c, SETTINGS)
     assert h.state == "degraded" and "JSONDecodeError" in h.reason
+
+
+@respx.mock
+async def test_litellm_non_object_model_info_body_is_degraded(svc):
+    """model_info() raises ValueError on a non-dict body; _probe_litellm's except clause catches it."""
+    respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
+    respx.get("http://litellm:4000/model/info").mock(return_value=httpx.Response(200, json=["oops"]))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["litellm"], c, SETTINGS)
+    assert h.state == "degraded" and "ValueError" in h.reason
+
+
+@respx.mock
+async def test_litellm_model_info_http_error_is_degraded_with_status_code(svc):
+    """model_info() raises httpx.HTTPStatusError; reason should surface the status code, not just the class name."""
+    respx.get("http://litellm:4000/health/readiness").mock(return_value=httpx.Response(200, json={"status": "connected"}))
+    respx.get("http://litellm:4000/model/info").mock(return_value=httpx.Response(500))
+    async with httpx.AsyncClient() as c:
+        h = await probe(svc["litellm"], c, SETTINGS)
+    assert h.state == "degraded" and "HTTP 500" in h.reason

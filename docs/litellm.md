@@ -19,6 +19,10 @@ using `string.Template`, and fails loudly (`KeyError` naming the missing variabl
 anything required is unset. There are no ODS mode files, no switchboard, no model-router —
 one template, rendered once per container start.
 
+After editing `config/litellm/ember.yaml.tmpl` or any LiteLLM-related `.env` value, run
+`docker compose restart litellm` (or `bin/ember restart`) — `bin/ember up` alone does not
+recreate the container for a template-only change, so the old rendered config keeps running.
+
 ## Alias table
 
 | Alias | `litellm_params.model` | Backing env var |

@@ -31,6 +31,10 @@ changing config. `bin/ember doctor` is the other deep path — it makes real `em
 Do not poll either of these on a timer. Doing so is what caused the Phase 1 incident where a
 15 s loop fired ~10 inference requests at the mini every ~30 s.
 
+After editing `config/litellm/ember.yaml.tmpl` or LiteLLM-related `.env` values, run
+`docker compose restart litellm` (or `bin/ember restart`) — `bin/ember up` alone does not
+recreate the container for a template-only change.
+
 ## `omlx restart`
 
 ```bash
