@@ -14,10 +14,12 @@ home-automation integration. Those responsibilities live elsewhere in the Vaxel 
 
 | Role | Owner | Ember's relationship |
 |---|---|---|
-| Human-facing UI | OpenWork | consumer of Ember APIs |
+| Human-facing UI | Open WebUI (`chat.vaxel.xyz`) | external consumer, separate stack; one LiteLLM virtual key ([ADR 0010](docs/adr/0010-frontend-routing-voice.md)) |
 | Reasoning, memory, skills, tools, MCP, HA, scheduling, RAG logic | Hermes Agent (on `jons-mac-mini`) | required first-class consumer |
 | Interactive software engineering | OpenCode (launched locally by Jon per repo) | optional consumer, never deployed by Ember |
 | Model routing, inference access, STT, TTS, provider management, observability, admin | **Ember-AI** | this repo |
+
+MCP is configured in Open WebUI / Hermes — never in ember-api.
 
 ODS (`Osmantic/ODS`) is a donor/reference implementation, not an architecture to preserve — see
 [`DOWNSTREAM.md`](DOWNSTREAM.md) for what was kept, what was deleted, and how to cherry-pick from upstream.
@@ -49,7 +51,7 @@ walkthrough, including STT/TTS validation and the mini-off drill.
 | `https://ai.vaxel.xyz/v1` | LiteLLM gateway | public, OpenAI-compatible; via Cloudflare tunnel on the Proxmox host → `http://172.20.142.7:4000` |
 | `http://172.20.142.7:4000/v1` | LiteLLM gateway | LAN — used by LAN consumers such as Hermes (`LLM_INTERNAL_URL`), no Cloudflare hairpin |
 | `https://ember.vaxel.xyz` | Ember dashboard | optional, recommend Cloudflare Access; via the same tunnel → `http://172.20.142.7:3001` |
-| `https://ai.vaxel.xyz` | OpenWork / Vaxel human UI | **not an Ember endpoint** — reserved for OpenWork, never raw inference |
+| `https://chat.vaxel.xyz` | Open WebUI (chat) | human UI — separate stack on Docker01, Ember only monitors it ([ADR 0010](docs/adr/0010-frontend-routing-voice.md)) |
 
 ## Model aliases
 

@@ -15,7 +15,7 @@ flowchart TB
         n8n
         HA["Home Assistant"]
         Voice["voice satellites"]
-        OpenWork
+        OpenWebUI["Open WebUI (chat.vaxel.xyz)"]
     end
 
     consumers -->|"OpenAI-compatible HTTP, one LiteLLM virtual key per consumer"| GW
@@ -72,7 +72,7 @@ every route. Endpoints:
 |---|---|---|
 | `GET /api/health` | self | liveness |
 | `GET /api/services` | manifests + HTTP probes, 15 s poll loop | per-service state machine |
-| `GET /api/nodes` | manifests | control-plane vs inference-node grouping |
+| `GET /api/nodes` | manifests | control-plane vs inference-node grouping, plus a `consumers` group |
 | `GET /api/models` | oMLX `/v1/models/status` + alias env vars | alias → provider → model → resident → size |
 | `GET /api/capabilities` | derived from oMLX health + env | llm/vision/embed/rerank/stt/tts availability |
 | `GET /api/providers` | config + env presence | oMLX, OpenRouter configured/reachable, no secrets echoed |
@@ -140,10 +140,23 @@ LiteLLM's healthy/unhealthy endpoint lists, or with `bin/ember doctor`, which ma
 
 React/Vite/Tailwind, reusing the ODS scaffold (theme context, layout, sidebar pattern).
 `ODSTalk`, `FirstBoot`, `Invites`, `RemoteProvider`, `Extensions`, `GPUMonitor` and the plugin
-registry are deleted. Pages: Overview (control-plane vs inference-node columns, state badges,
-capabilities grid), Models (alias table + oMLX resident models), Providers (oMLX/OpenRouter
+registry are deleted. Pages: Overview (control-plane vs inference-node columns plus a
+**Consumers** group for external consumers such as Open WebUI, state badges, capabilities
+grid), Models (alias table + oMLX resident models), Providers (oMLX/OpenRouter
 configured/reachable, gateway URLs), Settings (theme + `ember doctor`-equivalent config
 checks).
+
+### Open WebUI (external consumer)
+
+The human chat UI is Open WebUI at `chat.vaxel.xyz` — a **separate stack** on Docker01
+(`/opt/stacks/openwebui`), not part of the Ember compose file
+([ADR 0010](adr/0010-frontend-routing-voice.md)). Ember only monitors it: the
+`services/open-webui/manifest.yaml` tile (`type: external`, `role: consumer`, `managed: false`)
+appears under the dashboard's Consumers group, probed at `/health`. Open WebUI reaches the
+gateway over the LAN with a single LiteLLM virtual key and never receives provider keys; MCP
+is configured in Open WebUI / Hermes, never in ember-api. Reference deployment:
+[`deploy/openwebui/`](../deploy/openwebui/README.md), details in
+[`docs/open-webui.md`](open-webui.md).
 
 ### Qdrant (profile `qdrant`)
 
@@ -156,8 +169,8 @@ calls `ember-embed` itself.
 `ember up|down|restart|status|logs [service]|doctor|keys create <client> [--budget USD]`.
 `doctor` validates required `.env` variables, that `docker compose config` renders, that
 Qdrant (if running) has a real API key, oMLX reachability + `/health` parsing, LiteLLM
-readiness, a real `ember-auto` completion, and an `ember-embed` vector — exiting non-zero on
-any failure with a plain reason. See [`docs/troubleshooting.md`](troubleshooting.md).
+readiness, real `ember-auto` and `local-smart` completions, and an `ember-embed` vector —
+exiting non-zero on any failure with a plain reason. See [`docs/troubleshooting.md`](troubleshooting.md).
 
 ## Failure behaviour
 

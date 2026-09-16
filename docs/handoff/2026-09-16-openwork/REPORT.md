@@ -36,3 +36,12 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - Dashboard `Overview.jsx`: `NODES` += Consumers; filter per PLAN. Test: `open-webui` mock service asserted under Consumers and absent from the control-plane section (`within()`).
 - Tests: first run caught `public_url` None — the conftest `env` fixture lacked `CHAT_PUBLIC_URL`; added `OPENWEBUI_HOST`/`CHAT_PUBLIC_URL` to the fixture (mirrors a configured deployment). 55 pytest + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
 - Deviation: none beyond the fixture fix above.
+
+## Task 4 — reference Open WebUI stack + docs + doctor
+- Commit: `feat: reference Open WebUI stack, docs, and local-smart doctor check` (pushed; ci + secret-scan success).
+- `deploy/openwebui/compose.yml` exactly per PLAN (pinned `ghcr.io/open-webui/open-webui:v0.11.3`, virtual-key required, `DEFAULT_MODELS: local-smart`, 1536M limit, curl healthcheck).
+- `deploy/openwebui/.env.example` (python3 write, placeholders only) + `deploy/openwebui/README.md` (deploy steps, first-admin flow, key rotation, backup volume; states Open WebUI never receives provider keys).
+- `docs/open-webui.md`: role, topology diagram, consumer tile, PWA install, backup.
+- `bin/ember doctor`: `local-smart` completion check added after the `ember-auto` block. `tests/test-doctor.sh` needed no change (its stub answers any chat POST, as the PLAN predicted).
+- Tests: 55 pytest + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
+- Deviation: none.

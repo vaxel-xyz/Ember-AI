@@ -2,13 +2,13 @@
 
 **Date:** 2026-09-14
 **Repo:** `vaxel-xyz/Ember-AI` (fork of `Osmantic/ODS`, upstream at `v2.6.0` / `21f4b3a64`)
-**Status:** Approved in chat 2026-09-14 (sections 1–8, dashboard approach A, STT via oMLX). Amended same day for Jon's "Vaxel Service URLs, Ownership and Network Architecture" ADR: gateway = `ai.vaxel.xyz/v1`, dashboard = `ember.vaxel.xyz`, `ai.vaxel.xyz` = OpenWork (not Ember), aliases `ember-*`, TTS model under evaluation (not hard-coded Kokoro).
+**Status:** Approved in chat 2026-09-14 (sections 1–8, dashboard approach A, STT via oMLX). Amended same day for Jon's "Vaxel Service URLs, Ownership and Network Architecture" ADR: gateway = `ai.vaxel.xyz/v1`, dashboard = `ember.vaxel.xyz`, `ai.vaxel.xyz` = OpenWork (not Ember), aliases `ember-*`, TTS model under evaluation (not hard-coded Kokoro). **Amended 2026-09-16 (ADR 0010):** the human-facing UI is Open WebUI at `chat.vaxel.xyz` (separate stack); `ai.vaxel.xyz` now fronts the gateway; OpenWork is no longer part of the UI plan.
 
 ### Canonical public namespace (from ADR)
 
 | URL | Service | Ember-owned? |
 |---|---|---|
-| `https://ai.vaxel.xyz` | OpenWork / Vaxel human UI → Hermes | no — **never** a raw inference endpoint |
+| `https://ai.vaxel.xyz` | LiteLLM gateway (browser-facing root; API at `/v1`) | yes — amended 2026-09-16, ADR 0010 |
 | `https://ember.vaxel.xyz` | Ember-AI admin dashboard | yes |
 | `https://ai.vaxel.xyz/v1` | LiteLLM OpenAI-compatible gateway | yes |
 | `https://omlx.vaxel.xyz` | oMLX direct admin/API | no (existing) |
@@ -32,7 +32,7 @@ Ember-AI is **not**: a chat UI, an agent, a RAG application, an MCP host, a work
 
 | Role | Owner | Ember's relationship |
 |---|---|---|
-| Human-facing UI | OpenWork | consumer of Ember APIs |
+| Human-facing UI | Open WebUI (`chat.vaxel.xyz`, separate stack — amended 2026-09-16, ADR 0010) | external consumer, one virtual key |
 | Reasoning, memory, skills, tools, MCP, HA, scheduling, RAG logic | Hermes Agent (existing, on `jons-mac-mini`) | required first-class consumer |
 | Interactive software engineering | OpenCode (launched locally by Jon per repo) | optional consumer, never deployed by Ember |
 | Model routing, inference access, STT, TTS, provider mgmt, observability, admin | **Ember-AI** | this spec |
@@ -80,7 +80,7 @@ ODS is a **donor/reference implementation**, not an architecture to preserve. Le
 ## 3. Architecture
 
 ```text
- consumers: Hermes | OpenCode | n8n | Home Assistant | voice satellites | OpenWork
+ consumers: Hermes | OpenCode | n8n | Home Assistant | voice satellites | Open WebUI (chat)
         │   OpenAI-compatible HTTP, one LiteLLM virtual key per consumer
         ▼
  https://ai.vaxel.xyz/v1   (Cloudflare tunnel on Proxmox host → 172.20.142.7:4000; LAN clients use http://172.20.142.7:4000)
