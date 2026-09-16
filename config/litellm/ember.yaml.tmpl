@@ -1,0 +1,40 @@
+# Rendered at container start by render-config.py. Placeholders come from the environment.
+model_list:
+  - model_name: ember-auto
+    litellm_params: {model: "openai/${OMLX_CHAT_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+  - model_name: ember-local
+    litellm_params: {model: "openai/${OMLX_CHAT_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+  - model_name: ember-fast
+    litellm_params: {model: "openai/${OMLX_FAST_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+  - model_name: ember-code
+    litellm_params: {model: "openai/${OMLX_CODE_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+  - model_name: ember-vision
+    litellm_params: {model: "openai/${OMLX_VISION_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+  - model_name: ember-embed
+    litellm_params: {model: "openai/${OMLX_EMBED_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY", encoding_format: "float"}
+    model_info: {mode: embedding}
+  - model_name: ember-rerank
+    litellm_params: {model: "jina_ai/${OMLX_RERANK_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+    model_info: {mode: rerank}
+  - model_name: ember-stt
+    litellm_params: {model: "openai/${OMLX_STT_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+    model_info: {mode: audio_transcription}
+  - model_name: ember-tts
+    litellm_params: {model: "openai/${OMLX_TTS_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+    model_info: {mode: audio_speech, health_check_voice: af_heart}
+  - model_name: ember-think
+    litellm_params: {model: "openrouter/${OPENROUTER_THINK_MODEL}", api_key: "os.environ/OPENROUTER_API_KEY"}
+
+router_settings:
+  num_retries: 1
+  timeout: 300
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/LITELLM_DATABASE_URL
+  store_model_in_db: false
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 300
+  turn_off_message_logging: ${LITELLM_TURN_OFF_MESSAGE_LOGGING}

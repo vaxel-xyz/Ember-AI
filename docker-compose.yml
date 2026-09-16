@@ -1,0 +1,88 @@
+name: ember
+
+x-logging: &logging
+  logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }
+
+services:
+  litellm-postgres:
+    image: postgres:17-alpine
+    container_name: ember-litellm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${LITELLM_DB_PASSWORD}
+    volumes: [litellm-pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"], interval: 10s, timeout: 5s, retries: 10 }
+    <<: *logging
+
+  litellm:
+    image: ghcr.io/berriai/litellm:v1.81.3-stable
+    container_name: ember-litellm
+    restart: unless-stopped
+    depends_on: { litellm-postgres: { condition: service_healthy } }
+    env_file: .env
+    environment:
+      LITELLM_DATABASE_URL: postgresql://litellm:${LITELLM_DB_PASSWORD}@litellm-postgres:5432/litellm
+      DATABASE_URL: postgresql://litellm:${LITELLM_DB_PASSWORD}@litellm-postgres:5432/litellm
+    volumes:
+      - ./config/litellm/ember.yaml.tmpl:/app/ember.yaml.tmpl:ro
+      - ./config/litellm/render-config.py:/app/render-config.py:ro
+    ports: ["${BIND_ADDRESS:-127.0.0.1}:${LITELLM_PORT:-4000}:4000"]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        python3 /app/render-config.py /app/ember.yaml.tmpl /tmp/config.yaml
+        exec litellm --config /tmp/config.yaml --port 4000
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/readiness', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy: { resources: { limits: { memory: 1500M } } }
+    <<: *logging
+
+  ember-api:
+    build: ./ember-api
+    image: ghcr.io/vaxel-xyz/ember-api:local
+    container_name: ember-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      LITELLM_BASE_URL: http://litellm:4000
+      EMBER_SERVICES_DIR: /app/services
+      EMBER_LITELLM_TEMPLATE: /app/config/litellm/ember.yaml.tmpl
+    volumes:
+      - ./services:/app/services:ro
+      - ./config/litellm/ember.yaml.tmpl:/app/config/litellm/ember.yaml.tmpl:ro
+    ports: ["${BIND_ADDRESS:-127.0.0.1}:${EMBER_API_PORT:-3002}:3002"]
+    deploy: { resources: { limits: { memory: 256M } } }
+    <<: *logging
+
+  ember-dashboard:
+    build: ./dashboard
+    image: ghcr.io/vaxel-xyz/ember-dashboard:local
+    container_name: ember-dashboard
+    restart: unless-stopped
+    depends_on: [ember-api]
+    environment: { EMBER_API_KEY: "${EMBER_API_KEY}" }
+    ports: ["${BIND_ADDRESS:-127.0.0.1}:${EMBER_DASHBOARD_PORT:-3001}:3001"]
+    deploy: { resources: { limits: { memory: 64M } } }
+    <<: *logging
+
+  qdrant:
+    image: qdrant/qdrant:v1.16.3
+    container_name: ember-qdrant
+    profiles: [qdrant]
+    restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?QDRANT_API_KEY must be set (it ships in .env.example; keep the line even if the qdrant profile is unused)}
+    volumes: [qdrant-data:/qdrant/storage]
+    ports: ["${BIND_ADDRESS:-127.0.0.1}:${QDRANT_PORT:-6333}:6333"]
+    deploy: { resources: { limits: { memory: 1G } } }
+    <<: *logging
+
+volumes:
+  litellm-pgdata: {}
+  qdrant-data: {}

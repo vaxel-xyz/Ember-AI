@@ -4,7 +4,7 @@
 
 repos:
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.21.2
+    rev: v8.30.1
     hooks:
       - id: gitleaks
 
@@ -15,41 +15,23 @@ repos:
       - id: check-added-large-files
         args: ['--maxkb=500']
 
-  # Shellcheck on the installer + scripts surface. Mirrors the failing
-  # second pass of .github/workflows/lint-shell.yml — `--severity=error`
-  # is the bar that already gates CI, so existing warnings on the tree
-  # do not tip the pre-commit run while genuine errors are caught
-  # locally before push.
+  # Shellcheck on `bin/ember` + the bash test harness. `--severity=error`
+  # is the bar CI gates on, so existing style-level warnings do not tip the
+  # pre-commit run while genuine errors are caught locally before push.
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
     hooks:
       - id: shellcheck
-        name: shellcheck (installer + scripts, errors only)
-        files: ^ods/(installers|scripts)/.*\.(sh|bash)$
+        name: shellcheck (bin/ember + tests, errors only)
+        files: ^(bin/ember|tests/.*\.sh)$
         args: ['--exclude=SC1091,SC2034', '--severity=error']
 
-      # Catch legacy `…` command substitution anywhere in the installer
+      # Catch legacy `…` command substitution anywhere in the shell
       # surface. SC2006 is style-level so it's filtered out by the
       # severity=error pass above; an explicit --include re-enables it
       # without dragging the rest of style-level noise back in. The tree
       # is currently zero-SC2006, so this hook starts as a regression guard.
       - id: shellcheck
         name: shellcheck SC2006 (no legacy backticks)
-        files: ^ods/(installers|scripts)/.*\.(sh|bash)$
+        files: ^(bin/ember|tests/.*\.sh)$
         args: ['--include=SC2006']
-
-  # Custom local hook (issue #509): forbid backticks inside the BODY of
-  # unquoted here-documents. Even when the rest of the file passes
-  # shellcheck, an `<<EOF` heredoc body that contains `…` will silently
-  # run command substitution — which is easy to miss in a code review of
-  # generated systemd units, config files, or README fragments shipped
-  # by installer phases. Quoted heredocs (<<'EOF' / <<"EOF") are
-  # exempt because they suppress expansion entirely.
-  - repo: local
-    hooks:
-      - id: no-backticks-in-installer-heredocs
-        name: no-backticks-in-installer-heredocs
-        description: Forbid `…` command substitution inside unquoted heredoc bodies under ods/installers and ods/scripts.
-        language: system
-        files: ^ods/(installers|scripts)/.*\.(sh|bash)$
-        entry: awk -f ods/scripts/check-heredoc-backticks.awk
