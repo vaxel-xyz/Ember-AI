@@ -232,3 +232,26 @@ policy — a self-cleaning `DOCKER-USER` DROP rule for oMLX:8000 on Docker01, an
 `ember-api` container pointed at a stoppable `/health` stub on the compose network. The poll
 cadence table above is the substitute evidence for the ≤ 25 s claim; it bounds detection
 without needing the node down.
+
+## Branch 2 receipt (2026-09-16)
+
+Frontend/routing ADR applied to the live stack (`feature/frontend-routing-adr`, head at
+receipt time `5c56a990`). All values below are from the Docker01 control plane; no secrets
+are recorded.
+
+| Check | Result |
+|---|---|
+| Ember `.env` hostname | `LLM_PUBLIC_URL=https://ai.vaxel.xyz/v1`; `OPENWEBUI_HOST=172.20.142.7`, `CHAT_PUBLIC_URL=https://chat.vaxel.xyz` appended |
+| oMLX key rotation | the mini's oMLX bearer had been rotated since Phase 1; the current key was moved to `/opt/stacks/ember/.env` over an ssh pipe (never logged); `bin/ember restart` re-rendered the template |
+| `bin/ember doctor` | all checks passed, including the new `local-smart` completion (chat + embed green) |
+| `/model/info` alias set | 13 names: `ember-auto, ember-code, ember-embed, ember-fast, ember-local, ember-rerank, ember-stt, ember-think, ember-tts, ember-vision, heavy, local-fast, local-smart` |
+| Virtual key | `open-webui` created via `bin/ember keys create open-webui --budget 20` (name only recorded; an earlier same-alias key from a failed capture was deleted via `/key/delete` first) |
+| Open WebUI stack | `/opt/stacks/openwebui` from `deploy/openwebui/`; container `open-webui` healthy; `GET http://127.0.0.1:3003/health` → 200; `ENABLE_SIGNUP=true` left for Jon's first-admin sign-up |
+| Ember dashboard view | `/api/services`: `open-webui (healthy, consumer)`, `litellm (healthy, gateway)`; `/api/nodes`: `consumers: [open-webui]`, docker01 list excludes it |
+| Model list seen by the virtual key | `/v1/models` with the virtual key → the same 13 aliases |
+| Completion via the virtual key | `local-smart` chat completion → 200, content returned |
+| Memory on Docker01 | 2.9 GiB used / 7.8 GiB total; `open-webui` 1.17 GiB of its 1.5 GiB limit; `ember-litellm` 426 MiB; control plane unchanged |
+
+Pending (Jon): Cloudflare hostnames `ai./chat./ember.vaxel.xyz`; OpenRouter key into
+`/opt/stacks/ember/.env` (validates `heavy`/`ember-think`); first Open WebUI admin sign-up at
+`chat.vaxel.xyz`, then `ENABLE_SIGNUP=false`.
