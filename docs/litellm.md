@@ -37,6 +37,9 @@ recreate the container for a template-only change, so the old rendered config ke
 | `ember-stt` | `openai/${OMLX_STT_MODEL}` | `OMLX_STT_MODEL` |
 | `ember-tts` | `openai/${OMLX_TTS_MODEL}` | `OMLX_TTS_MODEL` |
 | `ember-think` | `openrouter/${OPENROUTER_THINK_MODEL}` | `OPENROUTER_THINK_MODEL` |
+| `local-fast` | `openai/${OMLX_FAST_MODEL}` | `OMLX_FAST_MODEL` (same target as `ember-fast`) |
+| `local-smart` | `openai/${OMLX_CHAT_MODEL}` | `OMLX_CHAT_MODEL` (same target as `ember-auto`) |
+| `heavy` | `openrouter/${OPENROUTER_THINK_MODEL}` | `OPENROUTER_THINK_MODEL` (same target as `ember-think`) |
 
 All oMLX-backed aliases share `api_base: ${OMLX_BASE_URL}/v1` and
 `api_key: os.environ/OMLX_API_KEY`. `ember-rerank` is configured and routes through LiteLLM

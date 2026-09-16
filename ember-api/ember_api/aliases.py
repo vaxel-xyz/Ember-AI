@@ -9,6 +9,7 @@ ALIASES: list[tuple[str, str, str]] = [  # alias, provider, env var holding mode
     ("ember-code", "omlx", "OMLX_CODE_MODEL"), ("ember-vision", "omlx", "OMLX_VISION_MODEL"), ("ember-embed", "omlx", "OMLX_EMBED_MODEL"),
     ("ember-rerank", "omlx", "OMLX_RERANK_MODEL"),
     ("ember-stt", "omlx", "OMLX_STT_MODEL"), ("ember-tts", "omlx", "OMLX_TTS_MODEL"), ("ember-think", "openrouter", "OPENROUTER_THINK_MODEL"),
+    ("local-fast", "omlx", "OMLX_FAST_MODEL"), ("local-smart", "omlx", "OMLX_CHAT_MODEL"), ("heavy", "openrouter", "OPENROUTER_THINK_MODEL"),
 ]
 
 ALIAS_NAMES: list[str] = [a for a, _, _ in ALIASES]

@@ -68,6 +68,9 @@ backing model is `.env`-driven (see `config/litellm/ember.yaml.tmpl`). Current m
 | `ember-rerank` | oMLX | `bge-reranker-v2-m3` |
 | `ember-tts` | oMLX | `Kokoro-82M-bf16` |
 | `ember-think` | OpenRouter | `z-ai/glm-5.3` |
+| `local-fast` | oMLX | `Qwen2.5-3B-Instruct-4bit` (same target as `ember-fast`) |
+| `local-smart` | oMLX | `Ornith-1.5-9B-MLX-4bit` (same target as `ember-auto`) |
+| `heavy` | OpenRouter | `z-ai/glm-5.3` (same target as `ember-think`) |
 
 `ember-rerank` routes through LiteLLM with the `jina_ai/` provider prefix, which matches the
 Cohere/Jina-shaped `/v1/rerank` oMLX serves; validated against the live stack with scores

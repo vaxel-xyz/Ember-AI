@@ -23,7 +23,8 @@ def test_render_substitutes_all_placeholders_and_is_valid_yaml():
     out = yaml.safe_load(render_config.render(TMPL, ENV))
     names = [m["model_name"] for m in out["model_list"]]
     assert names == ["ember-auto", "ember-local", "ember-fast", "ember-code", "ember-vision",
-                     "ember-embed", "ember-rerank", "ember-stt", "ember-tts", "ember-think"]
+                     "ember-embed", "ember-rerank", "ember-stt", "ember-tts", "ember-think",
+                     "local-fast", "local-smart", "heavy"]
     auto = out["model_list"][0]["litellm_params"]
     assert auto == {"model": "openai/Ornith-1.5-9B-MLX-4bit", "api_base": "http://172.20.142.184:8000/v1", "api_key": "os.environ/OMLX_API_KEY"}
     assert out["litellm_settings"]["turn_off_message_logging"] is True
@@ -44,8 +45,17 @@ def test_non_chat_aliases_declare_their_mode():
     assert modes["ember-tts"] == "audio_speech"
     tts = next(m for m in out["model_list"] if m["model_name"] == "ember-tts")
     assert tts["model_info"]["health_check_voice"] == "af_heart"
-    for chat in ("ember-auto", "ember-local", "ember-fast", "ember-code", "ember-vision", "ember-think"):
+    for chat in ("ember-auto", "ember-local", "ember-fast", "ember-code", "ember-vision", "ember-think",
+                 "local-fast", "local-smart", "heavy"):
         assert modes[chat] is None, f"{chat} is a chat route; it needs no explicit mode"
+
+
+def test_human_aliases_share_targets_with_ember_aliases():
+    out = yaml.safe_load(render_config.render(TMPL, ENV))
+    by = {m["model_name"]: m["litellm_params"] for m in out["model_list"]}
+    assert by["local-fast"] == by["ember-fast"]
+    assert by["local-smart"] == by["ember-auto"]
+    assert by["heavy"] == by["ember-think"]
 
 
 def test_render_fails_loudly_on_missing_variable():

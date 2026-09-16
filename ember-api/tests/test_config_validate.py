@@ -1,4 +1,6 @@
 """Required-env derivation: the LiteLLM template is the single source of truth."""
+import json
+from pathlib import Path
 from string import Template
 
 from ember_api.routers.config import (
@@ -7,6 +9,8 @@ from ember_api.routers.config import (
     template_identifiers,
     template_path,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_template_path_honours_env_override(monkeypatch, litellm_template):
@@ -41,6 +45,12 @@ def test_previously_optional_vars_are_now_required(monkeypatch, litellm_template
     req = set(required_env())
     assert "OMLX_RERANK_MODEL" in req
     assert "LITELLM_TURN_OFF_MESSAGE_LOGGING" in req
+
+
+def test_schema_required_covers_template_identifiers():
+    req = set(json.loads((ROOT / ".env.schema.json").read_text())["required"])
+    ids = Template((ROOT / "config/litellm/ember.yaml.tmpl").read_text()).get_identifiers()
+    assert set(ids) <= req
 
 
 def test_unreadable_template_is_reported_as_a_failed_check(monkeypatch, tmp_path):
