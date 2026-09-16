@@ -4,6 +4,7 @@ import { useEmberApi } from '../hooks/useEmberApi'
 const NODES = [
   { id: 'docker01', title: 'Control plane · docker01' },
   { id: 'jons-mac-mini', title: 'Inference node · jons-mac-mini' },
+  { id: 'consumers', title: 'Consumers' },
 ]
 
 const SAFE_URL_SCHEME = /^https?:\/\//i
@@ -36,7 +37,7 @@ export default function Overview() {
       {NODES.map((n) => (
         <section key={n.id} className="space-y-2">
           <h2 className="text-sm uppercase tracking-wide text-theme-text-secondary">{n.title}</h2>
-          {services.filter((s) => s.node === n.id).map((s) => <ServiceRow key={s.id} s={s} />)}
+          {services.filter((s) => (n.id === 'consumers' ? s.role === 'consumer' : s.node === n.id && s.role !== 'consumer')).map((s) => <ServiceRow key={s.id} s={s} />)}
         </section>
       ))}
       <section className="space-y-2">

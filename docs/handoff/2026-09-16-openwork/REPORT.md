@@ -17,3 +17,13 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - Tests: 52 pytest + ruff clean, 4 dashboard tests, `tests/run.sh` ALL OK.
 - CI: `ci` run 35154505830 success; `secret-scan` success on `28868435`.
 - Deviation: none. (One flaky first `tests/run.sh` — doctor stub race — clean on re-run.)
+
+## Task 2 — local-fast/local-smart/heavy aliases + OMLX_RERANK_MODEL schema fix
+- Commit: `feat: add local-fast/local-smart/heavy aliases; require OMLX_RERANK_MODEL in schema` (pushed; ci + secret-scan success).
+- `ember.yaml.tmpl`: 3 new entries appended after `ember-think`, same targets as `ember-fast`/`ember-auto`/`ember-think`.
+- `aliases.py`: ALIASES now 13 names; `ALIAS_NAMES` derives, so the gateway probe expects 13 automatically (test_health.py derives from `ALIAS_NAMES` too — no hardcoded 10-list existed to extend; test_api.py mocks the gateway as unreachable, so no `/model/info` mock needed extending).
+- Tests added: `test_human_aliases_share_targets_with_ember_aliases` (identical `litellm_params` per pair), 13-name order assertion, chat-routes-no-mode loop extended, `test_schema_required_covers_template_identifiers` (`.env.schema.json` `required` ⊇ template identifiers).
+- `.env.schema.json`: `required` += `OMLX_RERANK_MODEL` (python3 edit; closes the Phase 1 open item).
+- Docs: alias tables in `docs/litellm.md` + `README.md` gained the three rows.
+- Tests: 54 pytest (was 52) + ruff clean; dashboard 4; `tests/run.sh` ALL OK.
+- Deviation: none.

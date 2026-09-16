@@ -1,9 +1,16 @@
 from ember_api.manifests import load_manifests
 
 
-def test_loads_all_six_services(services_dir, env):
+def test_loads_all_seven_services(services_dir, env):
     services = load_manifests(services_dir, env)
-    assert set(services) == {"litellm", "litellm-postgres", "ember-api", "ember-dashboard", "omlx", "qdrant"}
+    assert set(services) == {"litellm", "litellm-postgres", "ember-api", "ember-dashboard", "omlx", "qdrant", "open-webui"}
+
+
+def test_open_webui_is_an_external_consumer(services_dir, env):
+    owui = load_manifests(services_dir, env)["open-webui"]
+    assert owui.type == "external" and owui.role == "consumer" and owui.managed is False
+    assert owui.node == "docker01" and owui.port == 3003 and owui.health_path == "/health"
+    assert owui.public_url == "https://chat.vaxel.xyz"
 
 
 def test_host_env_overrides_default_host(services_dir, env):

@@ -208,7 +208,7 @@
           "required": ["node", "role", "managed"],
           "properties": {
             "node": { "type": "string", "enum": ["docker01", "jons-mac-mini"] },
-            "role": { "type": "string", "enum": ["gateway", "control", "inference", "storage", "observability"] },
+            "role": { "type": "string", "enum": ["gateway", "control", "inference", "storage", "observability", "consumer"] },
             "managed": { "type": "boolean" },
             "capabilities": { "type": "array", "items": { "type": "string", "enum": ["llm", "vision", "embeddings", "rerank", "stt", "tts"] } },
             "health_probe": { "type": "string", "enum": ["http", "omlx", "litellm", "postgres"], "default": "http" }

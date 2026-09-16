@@ -84,4 +84,8 @@ async def refresh(request: Request, deep: bool = False, settings: Settings = Dep
 async def nodes(request: Request):
     reg = request.app.state.registry
     groups = {"docker01": "control-plane", "jons-mac-mini": "inference-node"}
-    return {"nodes": [{"id": n, "role": r, "services": [s.id for s in reg.services.values() if s.node == n]} for n, r in groups.items()]}
+    out = [{"id": n, "role": r, "services": [s.id for s in reg.services.values() if s.node == n and s.role != "consumer"]}
+           for n, r in groups.items()]
+    out.append({"id": "consumers", "role": "consumers",
+                "services": [s.id for s in reg.services.values() if s.role == "consumer"]})
+    return {"nodes": out}

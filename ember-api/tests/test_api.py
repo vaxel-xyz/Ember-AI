@@ -54,7 +54,10 @@ def test_services_and_nodes(client):
     # ember-api sets external_link: false
     assert by_id["ember-api"]["ui_url"] is None
     nodes = client.get("/api/nodes", headers=AUTH).json()["nodes"]
-    assert {n["id"] for n in nodes} == {"docker01", "jons-mac-mini"}
+    assert {n["id"] for n in nodes} == {"docker01", "jons-mac-mini", "consumers"}
+    by_node = {n["id"]: n["services"] for n in nodes}
+    assert "open-webui" not in by_node["docker01"]
+    assert by_node["consumers"] == ["open-webui"]
 
 
 @respx.mock

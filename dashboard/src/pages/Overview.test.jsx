@@ -1,12 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import Overview from './Overview'
 
 beforeEach(() => {
   globalThis.fetch = vi.fn((url) => {
     if (url === '/api/services') return Promise.resolve({ ok: true, json: () => Promise.resolve({ polled_at: '2026-09-14T12:00:00Z', services: [
-      { id: 'litellm', name: 'LiteLLM Gateway', node: 'docker01', state: 'healthy', reason: '9 deployment(s) healthy', detail: {}, ui_url: 'http://172.20.142.7:4000/ui/' },
-      { id: 'omlx', name: 'oMLX', node: 'jons-mac-mini', state: 'degraded', reason: 'no model loaded', detail: { memory_used_gb: 0, memory_ceiling_gb: 10.2 }, ui_url: 'javascript:alert(1)' },
+      { id: 'litellm', name: 'LiteLLM Gateway', node: 'docker01', role: 'gateway', state: 'healthy', reason: '9 deployment(s) healthy', detail: {}, ui_url: 'http://172.20.142.7:4000/ui/' },
+      { id: 'omlx', name: 'oMLX', node: 'jons-mac-mini', role: 'inference', state: 'degraded', reason: 'no model loaded', detail: { memory_used_gb: 0, memory_ceiling_gb: 10.2 }, ui_url: 'javascript:alert(1)' },
+      { id: 'open-webui', name: 'Open WebUI (chat)', node: 'docker01', role: 'consumer', state: 'unreachable', reason: 'connection refused', detail: {}, ui_url: 'https://chat.vaxel.xyz' },
     ] }) })
     if (url === '/api/capabilities') return Promise.resolve({ ok: true, json: () => Promise.resolve({ capabilities: { stt: { provider: 'omlx', state: 'degraded', model: 'parakeet-tdt-0.6b-v3' } } }) })
     return Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({}) })
@@ -19,6 +20,11 @@ test('groups services by node and shows capabilities', async () => {
   expect(screen.getByText('Control plane · docker01')).toBeInTheDocument()
   expect(screen.getByText('Inference node · jons-mac-mini')).toBeInTheDocument()
   expect(screen.getByText('parakeet-tdt-0.6b-v3')).toBeInTheDocument()
+  // The Open WebUI consumer renders under Consumers, not the control plane
+  expect(screen.getByText('Consumers')).toBeInTheDocument()
+  expect(screen.getByText('Open WebUI (chat)')).toBeInTheDocument()
+  const controlSection = screen.getByText('Control plane · docker01').closest('section')
+  expect(within(controlSection).queryByText('Open WebUI (chat)')).toBeNull()
   // Built at runtime (not a literal substring in this file) so the CI grep
   // gate for stale branding doesn't trip over the assertion that is itself
   // checking for that same string's absence.
