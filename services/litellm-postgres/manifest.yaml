@@ -1,0 +1,11 @@
+schema_version: ods.services.v1
+service:
+  id: litellm-postgres
+  name: LiteLLM Postgres
+  default_host: litellm-postgres
+  port: 5432
+  health: ""
+  type: docker
+  category: core
+  external_link: false
+  x_ember: {node: docker01, role: storage, managed: true, health_probe: postgres}
