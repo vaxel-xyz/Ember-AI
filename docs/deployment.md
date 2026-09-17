@@ -313,3 +313,18 @@ touched** — the only change is Open WebUI's own environment (additive, reversi
 UI-side confirmation (model picker shows `hermes-agent`) lands with the next Open WebUI
 visit; the underlying connection is verified from the container itself. Agent turns can run
 long — the 1800 s timeout matches Hermes's `gateway_timeout`.
+
+### Open WebUI persistent-config note (2026-09-17)
+
+The first Open WebUI boot persisted its connection config into the database
+(`config` table: `openai.api_base_urls` etc.). With `ENABLE_PERSISTENT_CONFIG=true`
+(default), **env changes to those keys are ignored once persisted** — the Hermes connection
+added via env was silently dropped. Fix applied: stopped the container, backed up
+`webui.db`, deleted the persisted `openai.api_base_urls`/`api_keys`/`api_configs` and
+`models.base_models_cache` rows, restarted — env re-persisted with both connections
+(LiteLLM + Hermes). The Open WebUI virtual key was rotated at the same time (old key
+deleted from LiteLLM, fresh `open-webui` key minted into the stack `.env`).
+
+Rule of thumb: **connection changes are either admin-UI edits (persisted) or env edits
+followed by clearing the persisted rows** — env alone does nothing once the DB holds values.
+Reference-stack README updated accordingly.

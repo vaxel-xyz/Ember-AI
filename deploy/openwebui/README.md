@@ -53,6 +53,13 @@ Wait for the container to report healthy (`docker ps`), then check
 
 ## Operations
 
+- **Connections are persisted in Open WebUI's database** on first boot
+  (`ENABLE_PERSISTENT_CONFIG=true` by default). Changing `OPENAI_API_BASE_URLS` /
+  `OPENAI_API_KEYS` in `.env` alone does nothing afterwards — either edit the connections in
+  the admin UI (Settings → Connections), or stop the container, delete the persisted
+  `openai.api_base_urls` / `openai.api_keys` / `openai.api_configs` rows from
+  `webui.db` (back it up first), and start again so the env re-persists.
+
 - **Backup:** the named volume `openwebui_open-webui-data` holds all state (users, chats,
   settings). Back it up like any Docker volume.
 - **Model picker:** users see `local-fast`, `local-smart`, `local-code`, `local-vision` and
