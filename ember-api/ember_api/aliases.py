@@ -11,6 +11,7 @@ ALIASES: list[tuple[str, str, str]] = [  # alias, provider, env var holding mode
     ("local-code", "omlx", "OMLX_CODE_MODEL"), ("local-vision", "omlx", "OMLX_VISION_MODEL"),
     ("cloud-fast", "openrouter", "OPENROUTER_FAST_MODEL"),
     ("cloud-glm", "openrouter", "OPENROUTER_GLM_MODEL"),
+    ("cloud-gpt6", "codex", "CODEX_GPT6_MODEL"),
 ]
 
 ALIAS_NAMES: list[str] = [a for a, _, _ in ALIASES]

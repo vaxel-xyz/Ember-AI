@@ -1,0 +1,14 @@
+name: codex-proxy
+services:
+  codex-proxy:
+    image: ghcr.io/thezillo/codex-proxy:v0.2.6
+    container_name: codex-proxy
+    restart: unless-stopped
+    environment:
+      CODEXPROXY_DATA_DIR: /data
+      CODEXPROXY_API_KEYS: ${CODEX_PROXY_KEY:?CODEX_PROXY_KEY must be the proxy client key (openssl rand -hex 24); set the same value in the Ember stack .env}
+    ports: ["${BIND_ADDRESS:-0.0.0.0}:8787:8787"]
+    volumes:
+      - ./data:/data
+    deploy: { resources: { limits: { memory: 256M } } }
+    logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }

@@ -7,7 +7,7 @@ Personal homelab project (Vaxel) of Jon Howard-Totham. Public repository. Any ag
 2. `docs/handoff/2026-09-16-openwork/STATE.md` — verified state of repo, hosts, live stack.
 3. `docs/handoff/2026-09-16-openwork/CONTEXT.md` — environment facts, decisions, lessons.
 4. `docs/design/` — Phase 1 design + plan (history); `docs/handoff/2026-09-16-openwork/SPEC.md` + `PLAN.md` — current branch.
-5. `docs/adr/` — architecture decisions (0001–0010). ADR 0010 supersedes 0001 §1/§3.
+5. `docs/adr/` — architecture decisions (0001–0011). ADR 0010 supersedes 0001 §1/§3; ADR 0011 adds the Codex-subscription provider.
 
 ## Conventions
 - en-GB spelling in prose; conventional commits (`feat:`/`fix:`/`docs:`/`chore:`/`ci:`); one logical change per commit; never merge a PR yourself.

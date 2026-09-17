@@ -22,7 +22,7 @@ browser ── chat.vaxel.xyz ── Cloudflare tunnel ──► Docker01 :3003 
   LiteLLM **virtual key** minted for it (`bin/ember keys create open-webui`) is its only
   credential (ADR 0010 §13).
 - **Models:** the picker shows the human-facing aliases `local-fast`, `local-smart`,
-  `local-code`, `local-vision`, `cloud-fast` and `cloud-glm` (plus the `ember-*` service aliases).
+  `local-code`, `local-vision`, `cloud-fast`, `cloud-glm` and `cloud-gpt6` (plus the `ember-*` service aliases).
   `local-smart` is the default (`DEFAULT_MODELS`).
 - **MCP:** configured inside Open WebUI (and Hermes) — never in ember-api (ADR 0010 §6).
 

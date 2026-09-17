@@ -1,6 +1,7 @@
 # Rendered at container start by render-config.py. Placeholders come from the environment.
 # Alias scheme (ADR 0010, amended 2026-09-17): ember- = local non-LLM services (embed/rerank/stt/tts);
-# local- = oMLX LLM/chat; cloud- = remote providers (OpenRouter now, Codex/gpt6 later).
+# local- = oMLX LLM/chat; cloud- = remote providers (OpenRouter; cloud-gpt6 via the Codex-subscription
+# bridge, ADR 0011).
 model_list:
   - model_name: ember-embed
     litellm_params: {model: "openai/${OMLX_EMBED_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY", encoding_format: "float"}
@@ -26,6 +27,8 @@ model_list:
     litellm_params: {model: "openrouter/${OPENROUTER_FAST_MODEL}", api_key: "os.environ/OPENROUTER_API_KEY"}
   - model_name: cloud-glm
     litellm_params: {model: "openrouter/${OPENROUTER_GLM_MODEL}", api_key: "os.environ/OPENROUTER_API_KEY"}
+  - model_name: cloud-gpt6
+    litellm_params: {model: "openai/${CODEX_GPT6_MODEL}", api_base: "${CODEX_BASE_URL}/v1", api_key: "os.environ/CODEX_PROXY_KEY"}
 
 router_settings:
   num_retries: 1

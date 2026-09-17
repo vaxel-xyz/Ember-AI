@@ -1,9 +1,16 @@
 from ember_api.manifests import load_manifests
 
 
-def test_loads_all_seven_services(services_dir, env):
+def test_loads_all_eight_services(services_dir, env):
     services = load_manifests(services_dir, env)
-    assert set(services) == {"litellm", "litellm-postgres", "ember-api", "ember-dashboard", "omlx", "qdrant", "open-webui"}
+    assert set(services) == {"litellm", "litellm-postgres", "ember-api", "ember-dashboard", "omlx", "qdrant", "open-webui", "codex-proxy"}
+
+
+def test_codex_proxy_is_an_unmanaged_inference_tile(services_dir, env):
+    cp = load_manifests(services_dir, env)["codex-proxy"]
+    assert cp.type == "external" and cp.role == "inference" and cp.managed is False
+    assert cp.node == "docker01" and cp.port == 8787 and cp.health_path == "/health"
+    assert cp.public_url is None and cp.external_link is False
 
 
 def test_open_webui_is_an_external_consumer(services_dir, env):

@@ -37,6 +37,7 @@ recreate the container for a template-only change, so the old rendered config ke
 | `local-vision` | `openai/${OMLX_VISION_MODEL}` | `OMLX_VISION_MODEL` |
 | `cloud-fast` | `openrouter/${OPENROUTER_FAST_MODEL}` | `OPENROUTER_FAST_MODEL` |
 | `cloud-glm` | `openrouter/${OPENROUTER_GLM_MODEL}` | `OPENROUTER_GLM_MODEL` |
+| `cloud-gpt6` | `openai/${CODEX_GPT6_MODEL}` at `${CODEX_BASE_URL}/v1` | `CODEX_GPT6_MODEL` (bridge: [ADR 0011](adr/0011-codex-subscription-provider.md)) |
 
 Alias tiers (ADR 0010, amended 2026-09-17): `ember-` = local non-LLM services
 (embed/rerank/stt/tts), `local-` = oMLX LLM/chat, `cloud-` = remote providers.

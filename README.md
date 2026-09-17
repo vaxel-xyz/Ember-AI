@@ -70,6 +70,7 @@ backing model is `.env`-driven (see `config/litellm/ember.yaml.tmpl`). Current m
 | `local-vision` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
 | `cloud-fast` | OpenRouter | `inception/mercury-2.5` |
 | `cloud-glm` | OpenRouter | `z-ai/glm-5.3-flash` |
+| `cloud-gpt6` | Codex (ChatGPT subscription) | `gpt-6` via the codex-proxy bridge ([ADR 0011](docs/adr/0011-codex-subscription-provider.md)) |
 
 Alias tiers (ADR 0010, amended 2026-09-17): `ember-` = local non-LLM services
 (embed/rerank/stt/tts), `local-` = oMLX LLM/chat, `cloud-` = remote providers.
