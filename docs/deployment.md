@@ -295,3 +295,21 @@ stack `.env`; no secret value logged anywhere.
 Caveats (ADR 0011): unofficial ChatGPT backend (ToS risk accepted by Jon); subscription quota
 is the ceiling for `cloud-gpt6`; exactly one proxy instance per `data/`; no audio via this
 path — `ember-stt`/`ember-tts` stay on oMLX.
+
+## Hermes backend receipt (2026-09-17, ADR 0012)
+
+Open WebUI gained a second, separate OpenAI-compatible connection to the Hermes agent
+gateway on the mini. **No Hermes config, service, firewall rule, or the n8n MCP front was
+touched** — the only change is Open WebUI's own environment (additive, reversible).
+
+| Check | Result |
+|---|---|
+| Hermes gateway (pre-check) | `GET :8642/health` → 200 (`hermes-agent 0.20.4`); `/v1/models` → `hermes-agent` |
+| Path from the Open WebUI container | `/v1/models` → `hermes-agent`; non-stream completion → "pong"; streaming → SSE + `[DONE]` |
+| Open WebUI env | `OPENAI_API_BASE_URLS` = LiteLLM `;` Hermes; `OPENAI_API_KEYS` = virtual key `;` Hermes key (values never logged); `AIOHTTP_CLIENT_TIMEOUT=1800` |
+| Restart | container recreated, healthy, no connection errors in logs |
+| Hermes side | config.yaml, launchd, PF anchor, n8n MCP front, dashboard — all unchanged (verified by inspection before and after) |
+
+UI-side confirmation (model picker shows `hermes-agent`) lands with the next Open WebUI
+visit; the underlying connection is verified from the container itself. Agent turns can run
+long — the 1800 s timeout matches Hermes's `gateway_timeout`.
