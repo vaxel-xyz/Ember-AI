@@ -255,3 +255,22 @@ are recorded.
 Pending (Jon): Cloudflare hostnames `ai./chat./ember.vaxel.xyz`; OpenRouter key into
 `/opt/stacks/ember/.env` (validates `heavy`/`ember-think`); first Open WebUI admin sign-up at
 `chat.vaxel.xyz`, then `ENABLE_SIGNUP=false`.
+
+## Cloud alias validation receipt (2026-09-17)
+
+OpenRouter key provisioned in `/opt/stacks/ember/.env` (fingerprint-checked into the running
+`ember-litellm` container; value never logged). Both cloud aliases validated end-to-end
+through the gateway with the master key:
+
+| Alias | Upstream model | Result |
+|---|---|---|
+| `cloud-glm` | `z-ai/glm-5.3-flash` | completion OK ("pong"), finish `stop`; 169 reasoning tokens on a trivial prompt — budget `max_tokens` accordingly |
+| `cloud-fast` | `inception/mercury-2.5` | completion OK ("pong"), finish `stop` |
+
+On-demand deep gateway check (`POST /api/services/refresh?deep=true`): 6/10 deployments
+healthy; the 4 failures are oMLX memory-guard artifacts of the deep check itself — it fires
+live calls at every deployment concurrently and the mini (16 GB, shared with desktop use)
+refuses to load `bge-reranker-v2-m3`, `Ornith-1.5-9B` and `gemma-4-12B` all at once. Spot
+check: `local-code` (gemma-4-12B) completes fine when called individually. Do not read the
+deep check's unhealthy list as an outage; the shallow probe and `bin/ember doctor` are the
+health truth.
