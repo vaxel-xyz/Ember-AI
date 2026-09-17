@@ -81,3 +81,14 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - Docker01: doctor green; 13 aliases; `open-webui` healthy; dashboard consumer tile healthy.
 - No secret values in git, this report, or logs.
 - Draft PR #2: opened with this file as body (see PR URL printed by the session).
+
+## Addendum (2026-09-17, Jon-directed) — alias namespace consolidation
+- Commit: `e2316fd0` `feat: consolidate alias namespace — ember- services, local- oMLX chat, cloud- remote` (pushed; ci + secret-scan success).
+- Jon's three-tier scheme (amends ADR 0010 §3–4, amendment note added to the ADR):
+  - `ember-` = local non-LLM services: `ember-embed`, `ember-rerank`, `ember-stt`, `ember-tts`
+  - `local-` = oMLX LLM/chat: `local-fast`, `local-smart`, `local-code` (was `ember-code`), `local-vision` (was `ember-vision`)
+  - `cloud-` = remote providers: `cloud-smart` (was `heavy`, same OpenRouter target); `cloud-gpt6` reserved for a future Codex-subscription route
+- Removed as duplicates: `ember-auto`, `ember-local`, `ember-fast`, `ember-think`, `heavy`. Pre-checked gateway spend logs (2026-09-10→17): no external consumer used the removed names (only Phase 1 validation/doctor traffic).
+- Updated: template, `aliases.py` (9 names), render/API tests, `bin/ember doctor` (ember-auto block dropped; local-smart + ember-embed remain), README, litellm/architecture/hermes-cutover/troubleshooting/omlx/open-webui docs, deploy/openwebui README, roadmap. Accepted ADRs 0001/0004/0009 keep their historical mentions; ADR 0010 carries the amendment.
+- Live on Docker01: `git pull` + `bin/ember restart`; doctor green; `/model/info` = exactly the 9 new names; gateway probe healthy against the new set; Open WebUI still healthy and its virtual key sees the 9; dashboard services all healthy.
+- Note: PR #2's body was set at creation and does not include this addendum; the commits are on the same branch.
