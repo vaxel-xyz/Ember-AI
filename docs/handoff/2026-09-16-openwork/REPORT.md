@@ -105,3 +105,9 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - New alias `cloud-fast` → `openrouter/inception/mercury-2.5` (slug verified against OpenRouter's public model list; 260k context). Backing env var `OPENROUTER_FAST_MODEL` added to `.env.example`, `.env.schema.json` (required), Docker01 `.env`, tests, docs, ADR 0010 amendment.
 - Alias set now 10. Live: pull + restart; doctor green; `/model/info` lists all 10 incl. `cloud-fast`.
 - `cloud-fast`/`cloud-glm` completions remain blocked on `OPENROUTER_API_KEY=CHANGE_ME` (Jon's item) — aliases registered and routable.
+
+## Addendum 4 (2026-09-17) — OpenRouter key provisioned, cloud aliases validated
+- Receipt commit: `docs: cloud alias validation receipt` (pushed; ci success). Key fingerprint-checked into the running container — no restart needed, value never logged.
+- `cloud-glm` (z-ai/glm-5.3-flash) and `cloud-fast` (inception/mercury-2.5) both return real completions through the gateway with usage/cost tracking. Note: GLM flash burns ~170 reasoning tokens on a trivial prompt — size `max_tokens` for chat clients.
+- Deep gateway check 6/10: the 4 unhealthy are oMLX memory-guard artifacts of the deep check's concurrent load on the shared mini (reranker/Ornith/gemma won't co-load). `local-code` verified fine individually. Documented in `docs/deployment.md` so nobody reads the deep list as an outage.
+- Closes the last Phase 1 open item ("cloud alias unvalidated"). Remaining Jon items: Cloudflare hostnames, first Open WebUI admin, and the parked cloud-gpt6/Codex decision.
