@@ -274,3 +274,24 @@ refuses to load `bge-reranker-v2-m3`, `Ornith-1.5-9B` and `gemma-4-12B` all at o
 check: `local-code` (gemma-4-12B) completes fine when called individually. Do not read the
 deep check's unhealthy list as an outage; the shallow probe and `bin/ember doctor` are the
 health truth.
+
+## Codex subscription bridge receipt (2026-09-17, ADR 0011)
+
+`codex-proxy` v0.2.6 deployed at `/opt/stacks/codex-proxy` (separate stack, port 8787, LAN
+only). ChatGPT OAuth seeded over an ssh pipe into `data/auth.json` (canonical credential
+store; the mini's copy is now stale). Client key generated on-host, shared with the Ember
+stack `.env`; no secret value logged anywhere.
+
+| Check | Result |
+|---|---|
+| Proxy health | `GET :8787/health` → 200; container healthy |
+| Proxy models | `gpt-6-astra`, `gpt-6`, `gpt-5.6-sol/terra/luna`, `gpt-5.6`, `gpt-5.5` |
+| Direct completion | `gpt-6` via the client key → "pong", 29 total tokens |
+| Gateway alias | `/model/info` lists 11 aliases incl. `cloud-gpt6` |
+| `cloud-gpt6` via gateway | master key → "pong" (`gpt-6`); Open WebUI virtual key → "pong" |
+| Ember dashboard | `codex-proxy` tile `healthy` (docker01, role inference, unmanaged) |
+| Doctor | green (local-smart + ember-embed) |
+
+Caveats (ADR 0011): unofficial ChatGPT backend (ToS risk accepted by Jon); subscription quota
+is the ceiling for `cloud-gpt6`; exactly one proxy instance per `data/`; no audio via this
+path — `ember-stt`/`ember-tts` stay on oMLX.
