@@ -1,0 +1,13 @@
+schema_version: ods.services.v1
+service:
+  id: ember-api
+  name: Ember API
+  default_host: ember-api
+  port: 3002
+  external_port_env: EMBER_API_PORT
+  external_port_default: 3002
+  health: /api/health
+  type: docker
+  category: core
+  external_link: false
+  x_ember: {node: docker01, role: control, managed: true, health_probe: http}

@@ -1,0 +1,16 @@
+schema_version: ods.services.v1
+service:
+  id: litellm
+  name: LiteLLM Gateway
+  host_env: LITELLM_HOST
+  default_host: litellm
+  port: 4000
+  external_port_env: LITELLM_PORT
+  external_port_default: 4000
+  health: /health/readiness
+  health_timeout: 5
+  ui_path: /ui/
+  public_url_env: LLM_PUBLIC_URL
+  type: docker
+  category: core
+  x_ember: {node: docker01, role: gateway, managed: true, health_probe: litellm}

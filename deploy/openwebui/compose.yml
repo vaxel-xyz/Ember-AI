@@ -1,0 +1,30 @@
+name: openwebui
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.3
+    container_name: open-webui
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ENABLE_OLLAMA_API: "false"
+      ENABLE_OPENAI_API: "true"
+      OPENAI_API_BASE_URL: ${LITELLM_BASE_URL:-http://172.20.142.7:4000/v1}
+      OPENAI_API_KEY: ${LITELLM_VIRTUAL_KEY:?LITELLM_VIRTUAL_KEY must be a LiteLLM virtual key (bin/ember keys create open-webui)}
+      WEBUI_AUTH: "true"
+      ENABLE_SIGNUP: ${ENABLE_SIGNUP:-true}
+      WEBUI_URL: ${WEBUI_URL:-https://chat.vaxel.xyz}
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:?set WEBUI_SECRET_KEY (openssl rand -hex 32)}
+      DEFAULT_MODELS: local-smart
+      ENABLE_VERSION_UPDATE_CHECK: "false"
+    ports: ["${BIND_ADDRESS:-0.0.0.0}:${OPENWEBUI_PORT:-3003}:8080"]
+    volumes: [open-webui-data:/app/backend/data]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy: { resources: { limits: { memory: 1536M } } }
+    logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }
+volumes:
+  open-webui-data: {}

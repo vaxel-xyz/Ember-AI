@@ -1,0 +1,80 @@
+import asyncio
+import logging
+import os
+from contextlib import asynccontextmanager
+from datetime import UTC, datetime
+
+import httpx
+from fastapi import FastAPI
+
+from . import __version__
+from .health import ServiceHealth, probe
+from .manifests import Service, load_manifests
+from .routers import config, models, providers, services
+from .settings import Settings, get_settings
+
+log = logging.getLogger("ember-api")
+
+
+class Registry:
+    def __init__(self, services: dict[str, Service], settings: Settings, http: httpx.AsyncClient):
+        self.services, self._settings, self._http = services, settings, http
+        self.health: dict[str, ServiceHealth] = {}
+        self.polled_at: datetime | None = None
+
+    async def poll_once(self) -> None:
+        services = list(self.services.values())
+        results = await asyncio.gather(
+            *(probe(s, self._http, self._settings) for s in services), return_exceptions=True
+        )
+        health: dict[str, ServiceHealth] = {}
+        for service, result in zip(services, results, strict=True):
+            if isinstance(result, Exception):
+                log.error("probe failed for %s: %r", service.id, result)
+                health[service.id] = ServiceHealth(service.id, "unreachable", f"probe error: {type(result).__name__}")
+            else:
+                health[service.id] = result
+        self.health = health
+        self.polled_at = datetime.now(UTC)
+
+    async def run(self, interval_s: int) -> None:
+        """Supervisor loop: a probe raising must never stop future polls.
+
+        This is the one place a broad ``except`` is correct — ``asyncio.CancelledError``
+        derives from ``BaseException``, so shutdown still propagates.
+        """
+        while True:
+            try:
+                await self.poll_once()
+            except Exception:
+                log.exception("poll failed")
+            await asyncio.sleep(interval_s)
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI):
+    settings = get_settings()
+    app.state.http = httpx.AsyncClient()
+    app.state.registry = Registry(load_manifests(settings.services_dir, os.environ), settings, app.state.http)
+    task = None
+    if os.environ.get("EMBER_POLL_ON_START", "true") == "true":
+        task = asyncio.create_task(app.state.registry.run(settings.poll_interval_s))
+    yield
+    if task:
+        task.cancel()
+    await app.state.http.aclose()
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(title="Ember API", version=__version__, lifespan=_lifespan)
+
+    @app.get("/api/health")
+    async def health():
+        return {"status": "ok", "version": __version__}
+
+    for r in (services.router, models.router, providers.router, config.router):
+        app.include_router(r)
+    return app
+
+
+app = create_app()

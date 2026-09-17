@@ -1,0 +1,18 @@
+schema_version: ods.services.v1
+service:
+  id: open-webui
+  name: Open WebUI (chat)
+  host_env: OPENWEBUI_HOST
+  default_host: 172.20.142.7
+  port: 3003
+  health: /health
+  health_timeout: 5
+  ui_path: /
+  public_url_env: CHAT_PUBLIC_URL
+  type: external
+  category: optional
+  x_ember:
+    node: docker01
+    role: consumer
+    managed: false
+    health_probe: http
