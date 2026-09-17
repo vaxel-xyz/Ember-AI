@@ -92,3 +92,10 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - Updated: template, `aliases.py` (9 names), render/API tests, `bin/ember doctor` (ember-auto block dropped; local-smart + ember-embed remain), README, litellm/architecture/hermes-cutover/troubleshooting/omlx/open-webui docs, deploy/openwebui README, roadmap. Accepted ADRs 0001/0004/0009 keep their historical mentions; ADR 0010 carries the amendment.
 - Live on Docker01: `git pull` + `bin/ember restart`; doctor green; `/model/info` = exactly the 9 new names; gateway probe healthy against the new set; Open WebUI still healthy and its virtual key sees the 9; dashboard services all healthy.
 - Note: PR #2's body was set at creation and does not include this addendum; the commits are on the same branch.
+
+## Addendum 2 (2026-09-17, Jon-directed) — cloud-glm → glm-5.3-flash
+- Commit: `f79965cf` `feat: cloud-glm alias targets z-ai/glm-5.3-flash; rename OPENROUTER_GLM_MODEL` (pushed; ci + secret-scan success).
+- `cloud-smart` renamed to `cloud-glm` (cloud- aliases are named for their model, per Jon); target changed `z-ai/glm-5.3` → `z-ai/glm-5.3-flash`.
+- Backing env var renamed `OPENROUTER_THINK_MODEL` → `OPENROUTER_GLM_MODEL` (leftover of `ember-think`); updated template, aliases.py, providers.py, .env.example, .env.schema.json (required list), tests, docs. Phase 1 plan history doc keeps the old name (frozen record).
+- Live on Docker01: `.env` var renamed + set to `z-ai/glm-5.3-flash`, pull + restart; doctor green; `/model/info` = the 9 aliases with `cloud-glm`; all services healthy.
+- `cloud-glm` completion returns 401 from OpenRouter — expected: `OPENROUTER_API_KEY=CHANGE_ME` on Docker01 (open item since Phase 1). Alias is registered and routable; validation lands when Jon adds the key.
