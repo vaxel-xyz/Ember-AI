@@ -99,3 +99,9 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - Backing env var renamed `OPENROUTER_THINK_MODEL` → `OPENROUTER_GLM_MODEL` (leftover of `ember-think`); updated template, aliases.py, providers.py, .env.example, .env.schema.json (required list), tests, docs. Phase 1 plan history doc keeps the old name (frozen record).
 - Live on Docker01: `.env` var renamed + set to `z-ai/glm-5.3-flash`, pull + restart; doctor green; `/model/info` = the 9 aliases with `cloud-glm`; all services healthy.
 - `cloud-glm` completion returns 401 from OpenRouter — expected: `OPENROUTER_API_KEY=CHANGE_ME` on Docker01 (open item since Phase 1). Alias is registered and routable; validation lands when Jon adds the key.
+
+## Addendum 3 (2026-09-17, Jon-directed) — cloud-fast → inception/mercury-2.5
+- Commit: `dcdad689` `feat: cloud-fast alias targets inception/mercury-2.5 via OpenRouter` (pushed; ci + secret-scan success).
+- New alias `cloud-fast` → `openrouter/inception/mercury-2.5` (slug verified against OpenRouter's public model list; 260k context). Backing env var `OPENROUTER_FAST_MODEL` added to `.env.example`, `.env.schema.json` (required), Docker01 `.env`, tests, docs, ADR 0010 amendment.
+- Alias set now 10. Live: pull + restart; doctor green; `/model/info` lists all 10 incl. `cloud-fast`.
+- `cloud-fast`/`cloud-glm` completions remain blocked on `OPENROUTER_API_KEY=CHANGE_ME` (Jon's item) — aliases registered and routable.
