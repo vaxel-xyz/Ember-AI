@@ -111,3 +111,10 @@ Stacks on #1 (`feature/ember-lean-rebuild`, `b44d98123`). Draft PR to follow at 
 - `cloud-glm` (z-ai/glm-5.3-flash) and `cloud-fast` (inception/mercury-2.5) both return real completions through the gateway with usage/cost tracking. Note: GLM flash burns ~170 reasoning tokens on a trivial prompt — size `max_tokens` for chat clients.
 - Deep gateway check 6/10: the 4 unhealthy are oMLX memory-guard artifacts of the deep check's concurrent load on the shared mini (reranker/Ornith/gemma won't co-load). `local-code` verified fine individually. Documented in `docs/deployment.md` so nobody reads the deep list as an outage.
 - Closes the last Phase 1 open item ("cloud alias unvalidated"). Remaining Jon items: Cloudflare hostnames, first Open WebUI admin, and the parked cloud-gpt6/Codex decision.
+
+## Addendum 5 (2026-09-17, Jon-directed) — cloud-gpt6 via Codex subscription (ADR 0011)
+- Branch: `feature/codex-gpt6` (stacked on this branch / PR #2). Commits: `cefc2ee5` (feat: alias + reference stack + ADR 0011 + manifest tile; ci + secret-scan success) + `docs: codex subscription bridge validation receipt`.
+- ADR 0011 records the decision: codex-proxy (thezillo, v0.2.6 pinned) on Docker01 as a separate stack; ChatGPT OAuth seeded once from the mini over an ssh pipe; Docker01 `data/` is the canonical rotating credential store; single-instance rule; LAN-only; ToS risk and quota ceiling accepted by Jon; no audio via this path.
+- New alias `cloud-gpt6` → `openai/${CODEX_GPT6_MODEL}` (default `gpt-6`) at `${CODEX_BASE_URL}/v1` with `CODEX_PROXY_KEY`. Alias set now 11. New env vars in `.env.example`/`.env.schema.json` (required; `CODEX_PROXY_KEY` secret). New `services/codex-proxy/manifest.yaml` tile (external, role inference, unmanaged, `/health`).
+- Live: proxy healthy; direct completion "pong" (29 tokens); gateway `/model/info` = 11 aliases; `cloud-gpt6` via master key and via the Open WebUI virtual key both "pong"; dashboard tile healthy; doctor green.
+- Note: the mini's `~/.codex/auth.json` is now stale (Docker01 owns the rotated token) — don't run the Codex CLI on the mini against this account without re-seeding.
