@@ -26,6 +26,18 @@ browser ── chat.vaxel.xyz ── Cloudflare tunnel ──► Docker01 :3003 
   `local-smart` is the default (`DEFAULT_MODELS`).
 - **MCP:** configured inside Open WebUI (and Hermes) — never in ember-api (ADR 0010 §6).
 
+## Hermes Agent backend
+
+Alongside the Ember model aliases, Open WebUI has a **second, separate connection** to the
+Hermes agent gateway on the mini (`http://172.20.142.184:8642/v1`, model `hermes-agent`) —
+[ADR 0012](adr/0012-hermes-openwebui-backend.md). Hermes is an **execution agent**, not a
+model: it is deliberately *not* routed through LiteLLM, keeps its own tool/terminal/browser
+loop and its own model routing (OpenRouter primary, local oMLX fallback). Selecting
+`hermes-agent` in the picker chats with the agent; turns can run long while it works.
+Open WebUI's transcript and Hermes's own session store are both non-authoritative — durable
+knowledge still belongs in the Projects workspace (shared-knowledge ADR). The Hermes
+dashboard remains the administrative view of its sessions.
+
 ## Consumer tile
 
 `services/open-webui/manifest.yaml` declares it `type: external`, `role: consumer`,

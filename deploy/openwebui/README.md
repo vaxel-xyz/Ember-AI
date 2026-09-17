@@ -22,17 +22,25 @@ cp /opt/stacks/ember/deploy/openwebui/.env.example /opt/stacks/openwebui/.env
 
 (Or from the laptop: `scp -r deploy/openwebui vaxel-docker:/opt/stacks/openwebui`.)
 
-Fill in `/opt/stacks/openwebui/.env`:
+Fill in `/opt/stacks/openwebui/.env` — two connections, one key per base URL
+(ADR 0012):
 
 ```bash
 cd /opt/stacks/openwebui
-# virtual key — capture it without echoing it
-k=$(bin/ember keys create open-webui --budget 20 | awk '/^key:/{print $2}')   # run from /opt/stacks/ember
-sed -i "s|^LITELLM_VIRTUAL_KEY=.*|LITELLM_VIRTUAL_KEY=${k}|" .env
+# 1st key: the LiteLLM virtual key (run from /opt/stacks/ember; capture without echoing)
+k=$(bin/ember keys create open-webui --budget 20 | awk '/^key:/{print $2}')
+# 2nd key: the Hermes API key, piped from the mini without echoing
+h=$(ssh vaxel-mini 'grep "^API_SERVER_KEY=" ~/.hermes/.env' | cut -d= -f2)
+sed -i "s|^OPENAI_API_KEYS=.*|OPENAI_API_KEYS=${k};${h}|" .env
 sed -i "s|^WEBUI_SECRET_KEY=.*|WEBUI_SECRET_KEY=$(openssl rand -hex 32)|" .env
 chmod 600 .env
 docker compose up -d
 ```
+
+The second connection is the **Hermes agent gateway** on the mini — a distinct agent backend,
+deliberately not routed through LiteLLM ([ADR 0012](../../docs/adr/0012-hermes-openwebui-backend.md)).
+It appears in the model picker as `hermes-agent`; agent turns can run long (the 1800 s
+timeout matches Hermes's own gateway timeout).
 
 Wait for the container to report healthy (`docker ps`), then check
 `curl -s http://127.0.0.1:3003/health` returns 200.
@@ -50,8 +58,10 @@ Wait for the container to report healthy (`docker ps`), then check
 - **Model picker:** users see `local-fast`, `local-smart`, `local-code`, `local-vision` and
   `cloud-fast`/`cloud-glm`/`cloud-gpt6` (plus the `ember-*`
   aliases). `DEFAULT_MODELS: local-smart` makes the smart local model the default.
-- **Keys:** if the virtual key needs rotating, mint a new one with
-  `bin/ember keys create open-webui` and update `.env` + `docker compose up -d`.
+- **Keys:** if the LiteLLM virtual key needs rotating, mint a new one with
+  `bin/ember keys create open-webui` and update the first `OPENAI_API_KEYS` entry +
+  `docker compose up -d`. The Hermes key rotates on the mini (`~/.hermes/.env`) — update the
+  second entry to match.
 - **Ember's view:** the dashboard's `Consumers` group shows `open-webui` health, probed at
   `http://<OPENWEBUI_HOST>:3003/health`. It is `unreachable` when the stack is down — Ember
   does not start or stop it.

@@ -8,8 +8,11 @@ services:
     environment:
       ENABLE_OLLAMA_API: "false"
       ENABLE_OPENAI_API: "true"
-      OPENAI_API_BASE_URL: ${LITELLM_BASE_URL:-http://172.20.142.7:4000/v1}
-      OPENAI_API_KEY: ${LITELLM_VIRTUAL_KEY:?LITELLM_VIRTUAL_KEY must be a LiteLLM virtual key (bin/ember keys create open-webui)}
+      # Two separate OpenAI-compatible connections (ADR 0012): 1) the Ember LiteLLM gateway,
+      # 2) the Hermes agent gateway on the mini — Hermes is NOT routed through LiteLLM.
+      OPENAI_API_BASE_URLS: ${OPENAI_API_BASE_URLS:-http://172.20.142.7:4000/v1;http://172.20.142.184:8642/v1}
+      OPENAI_API_KEYS: ${OPENAI_API_KEYS:?OPENAI_API_KEYS needs one key per base URL (LiteLLM virtual key;Hermes API key)}
+      AIOHTTP_CLIENT_TIMEOUT: ${AIOHTTP_CLIENT_TIMEOUT:-1800}
       WEBUI_AUTH: "true"
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-true}
       WEBUI_URL: ${WEBUI_URL:-https://chat.vaxel.xyz}
