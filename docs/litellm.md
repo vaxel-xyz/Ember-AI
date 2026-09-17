@@ -35,6 +35,7 @@ recreate the container for a template-only change, so the old rendered config ke
 | `local-smart` | `openai/${OMLX_CHAT_MODEL}` | `OMLX_CHAT_MODEL` |
 | `local-code` | `openai/${OMLX_CODE_MODEL}` | `OMLX_CODE_MODEL` |
 | `local-vision` | `openai/${OMLX_VISION_MODEL}` | `OMLX_VISION_MODEL` |
+| `cloud-fast` | `openrouter/${OPENROUTER_FAST_MODEL}` | `OPENROUTER_FAST_MODEL` |
 | `cloud-glm` | `openrouter/${OPENROUTER_GLM_MODEL}` | `OPENROUTER_GLM_MODEL` |
 
 Alias tiers (ADR 0010, amended 2026-09-17): `ember-` = local non-LLM services

@@ -22,6 +22,8 @@ model_list:
     litellm_params: {model: "openai/${OMLX_CODE_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
   - model_name: local-vision
     litellm_params: {model: "openai/${OMLX_VISION_MODEL}", api_base: "${OMLX_BASE_URL}/v1", api_key: "os.environ/OMLX_API_KEY"}
+  - model_name: cloud-fast
+    litellm_params: {model: "openrouter/${OPENROUTER_FAST_MODEL}", api_key: "os.environ/OPENROUTER_API_KEY"}
   - model_name: cloud-glm
     litellm_params: {model: "openrouter/${OPENROUTER_GLM_MODEL}", api_key: "os.environ/OPENROUTER_API_KEY"}
 

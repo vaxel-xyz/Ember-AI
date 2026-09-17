@@ -8,7 +8,7 @@ external consumer (the `Consumers` tile on the dashboard); it never deploys or m
 Open WebUI never receives provider keys. It talks to the LiteLLM gateway over the LAN with a
 single **virtual key** minted for it (`bin/ember keys create open-webui`), and sees the
 human-facing aliases `local-fast`, `local-smart`, `local-code`, `local-vision` and
-`cloud-glm` in its model picker.
+`cloud-fast` and `cloud-glm` in its model picker.
 
 ## Deploy on Docker01
 
@@ -48,7 +48,7 @@ Wait for the container to report healthy (`docker ps`), then check
 - **Backup:** the named volume `openwebui_open-webui-data` holds all state (users, chats,
   settings). Back it up like any Docker volume.
 - **Model picker:** users see `local-fast`, `local-smart`, `local-code`, `local-vision` and
-  `cloud-glm` (plus the `ember-*`
+  `cloud-fast`/`cloud-glm` (plus the `ember-*`
   aliases). `DEFAULT_MODELS: local-smart` makes the smart local model the default.
 - **Keys:** if the virtual key needs rotating, mint a new one with
   `bin/ember keys create open-webui` and update `.env` + `docker compose up -d`.

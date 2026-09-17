@@ -68,6 +68,7 @@ backing model is `.env`-driven (see `config/litellm/ember.yaml.tmpl`). Current m
 | `local-smart` | oMLX | `Ornith-1.5-9B-MLX-4bit` |
 | `local-code` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
 | `local-vision` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
+| `cloud-fast` | OpenRouter | `inception/mercury-2.5` |
 | `cloud-glm` | OpenRouter | `z-ai/glm-5.3-flash` |
 
 Alias tiers (ADR 0010, amended 2026-09-17): `ember-` = local non-LLM services

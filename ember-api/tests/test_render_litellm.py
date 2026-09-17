@@ -14,7 +14,7 @@ ENV = {
     "OMLX_FAST_MODEL": "Qwen2.5-3B-Instruct-4bit", "OMLX_CODE_MODEL": "gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4",
     "OMLX_VISION_MODEL": "gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4", "OMLX_EMBED_MODEL": "bge-m3-mlx-8bit",
     "OMLX_STT_MODEL": "parakeet-tdt-0.6b-v3", "OMLX_TTS_MODEL": "Kokoro-82M-bf16", "OMLX_RERANK_MODEL": "bge-reranker-v2-m3",
-    "OPENROUTER_GLM_MODEL": "z-ai/glm-5.3-flash", "LITELLM_TURN_OFF_MESSAGE_LOGGING": "true",
+    "OPENROUTER_FAST_MODEL": "inception/mercury-2.5", "OPENROUTER_GLM_MODEL": "z-ai/glm-5.3-flash", "LITELLM_TURN_OFF_MESSAGE_LOGGING": "true",
 }
 TMPL = (ROOT / "config/litellm/ember.yaml.tmpl").read_text()
 
@@ -23,7 +23,7 @@ def test_render_substitutes_all_placeholders_and_is_valid_yaml():
     out = yaml.safe_load(render_config.render(TMPL, ENV))
     names = [m["model_name"] for m in out["model_list"]]
     assert names == ["ember-embed", "ember-rerank", "ember-stt", "ember-tts",
-                     "local-fast", "local-smart", "local-code", "local-vision", "cloud-glm"]
+                     "local-fast", "local-smart", "local-code", "local-vision", "cloud-fast", "cloud-glm"]
     embed = out["model_list"][0]["litellm_params"]
     assert embed == {"model": "openai/bge-m3-mlx-8bit", "api_base": "http://172.20.142.184:8000/v1",
                      "api_key": "os.environ/OMLX_API_KEY", "encoding_format": "float"}
@@ -39,6 +39,7 @@ def test_alias_prefixes_match_their_tier():
         assert name.startswith("ember-") and "OMLX_API_KEY" in by[name]["api_key"]
     for name in ("local-fast", "local-smart", "local-code", "local-vision"):
         assert name.startswith("local-") and by[name]["model"].startswith("openai/")
+    assert by["cloud-fast"] == {"model": "openrouter/inception/mercury-2.5", "api_key": "os.environ/OPENROUTER_API_KEY"}
     assert by["cloud-glm"] == {"model": "openrouter/z-ai/glm-5.3-flash", "api_key": "os.environ/OPENROUTER_API_KEY"}
 
 
@@ -56,7 +57,7 @@ def test_non_chat_aliases_declare_their_mode():
     assert modes["ember-tts"] == "audio_speech"
     tts = next(m for m in out["model_list"] if m["model_name"] == "ember-tts")
     assert tts["model_info"]["health_check_voice"] == "af_heart"
-    for chat in ("local-fast", "local-smart", "local-code", "local-vision", "cloud-glm"):
+    for chat in ("local-fast", "local-smart", "local-code", "local-vision", "cloud-fast", "cloud-glm"):
         assert modes[chat] is None, f"{chat} is a chat route; it needs no explicit mode"
 
 
