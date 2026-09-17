@@ -27,19 +27,18 @@ recreate the container for a template-only change, so the old rendered config ke
 
 | Alias | `litellm_params.model` | Backing env var |
 |---|---|---|
-| `ember-auto` | `openai/${OMLX_CHAT_MODEL}` | `OMLX_CHAT_MODEL` |
-| `ember-local` | `openai/${OMLX_CHAT_MODEL}` | `OMLX_CHAT_MODEL` (pinned local model) |
-| `ember-fast` | `openai/${OMLX_FAST_MODEL}` | `OMLX_FAST_MODEL` |
-| `ember-code` | `openai/${OMLX_CODE_MODEL}` | `OMLX_CODE_MODEL` |
-| `ember-vision` | `openai/${OMLX_VISION_MODEL}` | `OMLX_VISION_MODEL` |
 | `ember-embed` | `openai/${OMLX_EMBED_MODEL}` | `OMLX_EMBED_MODEL` |
 | `ember-rerank` | `jina_ai/${OMLX_RERANK_MODEL}` | `OMLX_RERANK_MODEL` |
 | `ember-stt` | `openai/${OMLX_STT_MODEL}` | `OMLX_STT_MODEL` |
 | `ember-tts` | `openai/${OMLX_TTS_MODEL}` | `OMLX_TTS_MODEL` |
-| `ember-think` | `openrouter/${OPENROUTER_THINK_MODEL}` | `OPENROUTER_THINK_MODEL` |
-| `local-fast` | `openai/${OMLX_FAST_MODEL}` | `OMLX_FAST_MODEL` (same target as `ember-fast`) |
-| `local-smart` | `openai/${OMLX_CHAT_MODEL}` | `OMLX_CHAT_MODEL` (same target as `ember-auto`) |
-| `heavy` | `openrouter/${OPENROUTER_THINK_MODEL}` | `OPENROUTER_THINK_MODEL` (same target as `ember-think`) |
+| `local-fast` | `openai/${OMLX_FAST_MODEL}` | `OMLX_FAST_MODEL` |
+| `local-smart` | `openai/${OMLX_CHAT_MODEL}` | `OMLX_CHAT_MODEL` |
+| `local-code` | `openai/${OMLX_CODE_MODEL}` | `OMLX_CODE_MODEL` |
+| `local-vision` | `openai/${OMLX_VISION_MODEL}` | `OMLX_VISION_MODEL` |
+| `cloud-smart` | `openrouter/${OPENROUTER_THINK_MODEL}` | `OPENROUTER_THINK_MODEL` |
+
+Alias tiers (ADR 0010, amended 2026-09-17): `ember-` = local non-LLM services
+(embed/rerank/stt/tts), `local-` = oMLX LLM/chat, `cloud-` = remote providers.
 
 All oMLX-backed aliases share `api_base: ${OMLX_BASE_URL}/v1` and
 `api_key: os.environ/OMLX_API_KEY`. `ember-rerank` is configured and routes through LiteLLM

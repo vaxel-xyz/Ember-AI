@@ -72,10 +72,10 @@ def test_capabilities_and_models(client):
     caps = client.get("/api/capabilities", headers=AUTH).json()["capabilities"]
     assert caps["stt"] == {"provider": "omlx", "state": "healthy", "model": "parakeet-tdt-0.6b-v3"}
     models = client.get("/api/models", headers=AUTH).json()
-    auto = next(a for a in models["aliases"] if a["alias"] == "ember-auto")
-    assert auto == {"alias": "ember-auto", "provider": "omlx", "model": "Ornith-1.5-9B-MLX-4bit", "resident": True, "estimated_size_gb": 5.29}
-    think = next(a for a in models["aliases"] if a["alias"] == "ember-think")
-    assert think["provider"] == "openrouter" and think["resident"] is None
+    smart = next(a for a in models["aliases"] if a["alias"] == "local-smart")
+    assert smart == {"alias": "local-smart", "provider": "omlx", "model": "Ornith-1.5-9B-MLX-4bit", "resident": True, "estimated_size_gb": 5.29}
+    cloud = next(a for a in models["aliases"] if a["alias"] == "cloud-smart")
+    assert cloud["provider"] == "openrouter" and cloud["resident"] is None
 
 
 def test_providers_never_echo_keys(client):

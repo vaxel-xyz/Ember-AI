@@ -25,7 +25,7 @@ The `gateway` object in the response carries LiteLLM's `healthy_endpoints` /
 `unhealthy_endpoints` lists. Expect non-chat deployments (embed, rerank, audio) to be
 reported accurately only because the template pins `model_info.mode` on each of them; a
 deployment reported unhealthy there is still worth confirming with a real request before
-changing config. `bin/ember doctor` is the other deep path — it makes real `ember-auto` and
+changing config. `bin/ember doctor` is the other deep path — it makes real `local-smart` and
 `ember-embed` calls.
 
 Do not poll either of these on a timer. Doing so is what caused the Phase 1 incident where a
@@ -74,5 +74,5 @@ downloaded but isn't listed yet, run `~/.omlx/bin/omlx restart` to force a resca
 
 `bin/ember doctor` prints a plain reason for each failed check (missing env var, compose
 config invalid, Qdrant running without a real API key, oMLX/LiteLLM/ember-api unreachable, or
-a failed `ember-auto`/`ember-embed` call). Fix the specific reason it prints — it does not
+a failed `local-smart`/`ember-embed` call). Fix the specific reason it prints — it does not
 aggregate beyond that.

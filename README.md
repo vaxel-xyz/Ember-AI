@@ -40,7 +40,7 @@ bin/ember doctor
 `OMLX_API_KEY`, `LITELLM_MASTER_KEY`, `EMBER_API_KEY`, `OMLX_CHAT_MODEL`,
 `OMLX_EMBED_MODEL`), that the compose config renders, that Qdrant (if running) has a real
 API key, that oMLX and LiteLLM are reachable, that ember-api is healthy, and runs one real
-`ember-auto` completion and one `ember-embed` request. See
+`local-smart` completion and one `ember-embed` request. See
 [`docs/deployment.md`](docs/deployment.md) for the full
 walkthrough, including STT/TTS validation and the mini-off drill.
 
@@ -60,19 +60,18 @@ backing model is `.env`-driven (see `config/litellm/ember.yaml.tmpl`). Current m
 
 | Alias | Provider | Model |
 |---|---|---|
-| `ember-auto` | oMLX | `Ornith-1.5-9B-MLX-4bit` |
-| `ember-local` | oMLX | `Ornith-1.5-9B-MLX-4bit` (pinned local model) |
-| `ember-fast` | oMLX | `Qwen2.5-3B-Instruct-4bit` |
-| `ember-code` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
-| `ember-vision` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
 | `ember-embed` | oMLX | `bge-m3-mlx-8bit` |
 | `ember-stt` | oMLX | `parakeet-tdt-0.6b-v3` |
 | `ember-rerank` | oMLX | `bge-reranker-v2-m3` |
 | `ember-tts` | oMLX | `Kokoro-82M-bf16` |
-| `ember-think` | OpenRouter | `z-ai/glm-5.3` |
-| `local-fast` | oMLX | `Qwen2.5-3B-Instruct-4bit` (same target as `ember-fast`) |
-| `local-smart` | oMLX | `Ornith-1.5-9B-MLX-4bit` (same target as `ember-auto`) |
-| `heavy` | OpenRouter | `z-ai/glm-5.3` (same target as `ember-think`) |
+| `local-fast` | oMLX | `Qwen2.5-3B-Instruct-4bit` |
+| `local-smart` | oMLX | `Ornith-1.5-9B-MLX-4bit` |
+| `local-code` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
+| `local-vision` | oMLX | `gemma-4-12B-agentic-fable5-composer2.5-v2-nvfp4` |
+| `cloud-smart` | OpenRouter | `z-ai/glm-5.3` |
+
+Alias tiers (ADR 0010, amended 2026-09-17): `ember-` = local non-LLM services
+(embed/rerank/stt/tts), `local-` = oMLX LLM/chat, `cloud-` = remote providers.
 
 `ember-rerank` routes through LiteLLM with the `jina_ai/` provider prefix, which matches the
 Cohere/Jina-shaped `/v1/rerank` oMLX serves; validated against the live stack with scores

@@ -29,6 +29,6 @@ desktop use.
 ## `auto` alias — routing policy (owner: Jon)
 
 A future `auto` alias that picks local vs cloud per request (cost, latency, privacy,
-availability) as a routing policy in front of `local-smart`/`heavy` (ADR 0010 §5). Deferred:
-needs a policy spec and evaluation harness before it becomes API surface. The `ember-*` and
+availability) as a routing policy in front of `local-smart`/`cloud-smart` (ADR 0010 §5). Deferred:
+needs a policy spec and evaluation harness before it becomes API surface. The `ember-*`, `local-*` and
 human-facing aliases stay stable regardless.

@@ -134,7 +134,7 @@ LiteLLM's `GET /health` is a **deep** check — it performs a live call per depl
 is never in the poll loop. Run it on demand with
 `POST /api/services/refresh?deep=true` (same bearer as every other route), which returns
 LiteLLM's healthy/unhealthy endpoint lists, or with `bin/ember doctor`, which makes real
-`ember-auto` and `ember-embed` calls. See `ember-api/ember_api/health.py`.
+`local-smart` and `ember-embed` calls. See `ember-api/ember_api/health.py`.
 
 ### ember-dashboard
 
@@ -169,15 +169,15 @@ calls `ember-embed` itself.
 `ember up|down|restart|status|logs [service]|doctor|keys create <client> [--budget USD]`.
 `doctor` validates required `.env` variables, that `docker compose config` renders, that
 Qdrant (if running) has a real API key, oMLX reachability + `/health` parsing, LiteLLM
-readiness, real `ember-auto` and `local-smart` completions, and an `ember-embed` vector —
+readiness, real `local-smart` and `ember-embed` calls —
 exiting non-zero on any failure with a plain reason. See [`docs/troubleshooting.md`](troubleshooting.md).
 
 ## Failure behaviour
 
 | Failure | Result |
 |---|---|
-| mini off | control plane stays up; `omlx` reports `unreachable`; oMLX-backed aliases return LiteLLM 5xx with a clear backend error; `ember-think` still works |
+| mini off | control plane stays up; `omlx` reports `unreachable`; oMLX-backed aliases return LiteLLM 5xx with a clear backend error; `cloud-smart` still works |
 | oMLX up, no model loaded | oMLX reports `degraded`; first request triggers on-demand load (oMLX LRU); dashboard shows `loaded_count` |
 | Docker VM off | Ember is unavailable; Hermes may still hit oMLX directly until cutover — after cutover, rollback is documented in [`docs/hermes-cutover.md`](hermes-cutover.md) |
-| Internet off | local aliases work on the LAN URL; the cloud alias (`ember-think`) fails; the Cloudflare path is down |
+| Internet off | local aliases work on the LAN URL; the cloud alias (`cloud-smart`) fails; the Cloudflare path is down |
 | Langfuse down (Phase 3+) | LiteLLM continues — callback failures are non-blocking; dashboard shows Langfuse unhealthy |

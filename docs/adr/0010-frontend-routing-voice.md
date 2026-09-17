@@ -5,6 +5,8 @@
 **Project:** `vaxel-xyz/Ember-AI`
 **Author:** Jon Howard-Totham. Text reproduced verbatim except: the Home Assistant remote MCP URL is redacted (this repository is public) and ASCII arrows replace box-drawing characters.
 
+**Amended 2026-09-17 (alias namespace):** §3–4's "add human-facing aliases beside `ember-*`" is consolidated into a three-tier scheme — `ember-` = local non-LLM services (`ember-embed`, `ember-rerank`, `ember-stt`, `ember-tts`), `local-` = oMLX LLM/chat (`local-fast`, `local-smart`, `local-code`, `local-vision`), `cloud-` = remote providers (`cloud-smart` = OpenRouter; `cloud-gpt6` reserved for a future Codex-subscription route). The duplicated `ember-auto`/`ember-local`/`ember-fast`/`ember-think` and `heavy` names are retired before any external consumer (Hermes cutover) depends on them; nothing live used them (verified against gateway spend logs 2026-09-10→17).
+
 ## Context
 
 The Ember platform is intended to become the primary AI interface for the Vaxel environment.

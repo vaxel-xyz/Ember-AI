@@ -11,7 +11,7 @@ carried out until that validation is complete and Jon has approved moving to Pha
 
 On `jons-mac-mini`, edit `~/.hermes/config.yaml` and change the `local-omlx` provider's
 `base_url` from `http://127.0.0.1:8000/v1` to Ember's LiteLLM gateway, with a LiteLLM virtual
-key instead of the raw oMLX key, and point the model at the `ember-local` alias rather than a
+key instead of the raw oMLX key, and point the model at the `local-smart` alias rather than a
 concrete oMLX model id:
 
 ```yaml
@@ -19,11 +19,11 @@ providers:
   local-omlx:
     base_url: http://172.20.142.7:4000/v1
     api_key: <virtual key from `bin/ember keys create hermes`>
-    model: ember-local
+    model: local-smart
 ```
 
 Hermes's primary provider (OpenRouter) can either stay as-is, or be switched to route through
-Ember's `ember-think` alias instead of calling OpenRouter directly — both are acceptable;
+Ember's `cloud-smart` alias instead of calling OpenRouter directly — both are acceptable;
 whichever is chosen, `local-omlx` (renamed or not) becomes Ember-backed rather than
 oMLX-direct.
 
