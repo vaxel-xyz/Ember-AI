@@ -23,7 +23,7 @@ providers:
 ```
 
 Hermes's primary provider (OpenRouter) can either stay as-is, or be switched to route through
-Ember's `cloud-smart` alias instead of calling OpenRouter directly — both are acceptable;
+Ember's `cloud-glm` alias instead of calling OpenRouter directly — both are acceptable;
 whichever is chosen, `local-omlx` (renamed or not) becomes Ember-backed rather than
 oMLX-direct.
 

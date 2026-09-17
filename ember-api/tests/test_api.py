@@ -74,7 +74,7 @@ def test_capabilities_and_models(client):
     models = client.get("/api/models", headers=AUTH).json()
     smart = next(a for a in models["aliases"] if a["alias"] == "local-smart")
     assert smart == {"alias": "local-smart", "provider": "omlx", "model": "Ornith-1.5-9B-MLX-4bit", "resident": True, "estimated_size_gb": 5.29}
-    cloud = next(a for a in models["aliases"] if a["alias"] == "cloud-smart")
+    cloud = next(a for a in models["aliases"] if a["alias"] == "cloud-glm")
     assert cloud["provider"] == "openrouter" and cloud["resident"] is None
 
 
@@ -108,13 +108,13 @@ def test_deep_refresh_runs_deployment_health(client):
     respx.get(url__regex=r"http://(ember-api|ember-dashboard|qdrant):.*").mock(side_effect=httpx.ConnectError("x"))
     respx.get("http://litellm:4000/health").mock(return_value=httpx.Response(200, json={
         "healthy_endpoints": [{"model": "openai/Ornith-1.5-9B-MLX-4bit"}],
-        "unhealthy_endpoints": [{"model": "openrouter/z-ai/glm-5.3", "error": "401"}],
+        "unhealthy_endpoints": [{"model": "openrouter/z-ai/glm-5.3-flash", "error": "401"}],
         "healthy_count": 1, "unhealthy_count": 1}))
     body = client.post("/api/services/refresh?deep=true", headers=AUTH).json()
     assert body["deep"] is True
     assert body["gateway"]["ok"] is False
     assert body["gateway"]["healthy_count"] == 1
-    assert body["gateway"]["unhealthy_endpoints"] == [{"model": "openrouter/z-ai/glm-5.3", "error": "401"}]
+    assert body["gateway"]["unhealthy_endpoints"] == [{"model": "openrouter/z-ai/glm-5.3-flash", "error": "401"}]
 
 
 def test_deep_refresh_requires_key(client):

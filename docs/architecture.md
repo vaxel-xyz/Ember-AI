@@ -44,7 +44,7 @@ flowchart TB
     LiteLLM -->|"LAN, bearer OMLX_API_KEY"| oMLX
     EmberAPI -.probes.-> oMLX
 
-    LiteLLM --> OpenRouter["OpenRouter: z-ai/glm-5.3"]
+    LiteLLM --> OpenRouter["OpenRouter: z-ai/glm-5.3-flash"]
 ```
 
 ## Components
@@ -176,8 +176,8 @@ exiting non-zero on any failure with a plain reason. See [`docs/troubleshooting.
 
 | Failure | Result |
 |---|---|
-| mini off | control plane stays up; `omlx` reports `unreachable`; oMLX-backed aliases return LiteLLM 5xx with a clear backend error; `cloud-smart` still works |
+| mini off | control plane stays up; `omlx` reports `unreachable`; oMLX-backed aliases return LiteLLM 5xx with a clear backend error; `cloud-glm` still works |
 | oMLX up, no model loaded | oMLX reports `degraded`; first request triggers on-demand load (oMLX LRU); dashboard shows `loaded_count` |
 | Docker VM off | Ember is unavailable; Hermes may still hit oMLX directly until cutover — after cutover, rollback is documented in [`docs/hermes-cutover.md`](hermes-cutover.md) |
-| Internet off | local aliases work on the LAN URL; the cloud alias (`cloud-smart`) fails; the Cloudflare path is down |
+| Internet off | local aliases work on the LAN URL; the cloud alias (`cloud-glm`) fails; the Cloudflare path is down |
 | Langfuse down (Phase 3+) | LiteLLM continues — callback failures are non-blocking; dashboard shows Langfuse unhealthy |

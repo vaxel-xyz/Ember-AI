@@ -15,14 +15,14 @@ browser ── chat.vaxel.xyz ── Cloudflare tunnel ──► Docker01 :3003 
                                               LiteLLM gateway :4000/v1  (ai.vaxel.xyz/v1)
                                                       │
                                                       ▼
-                                    oMLX on jons-mac-mini  /  OpenRouter (cloud-smart)
+                                    oMLX on jons-mac-mini  /  OpenRouter (cloud-glm)
 ```
 
 - **Auth:** Open WebUI's own accounts (`WEBUI_AUTH=true`). It never sees provider keys — one
   LiteLLM **virtual key** minted for it (`bin/ember keys create open-webui`) is its only
   credential (ADR 0010 §13).
 - **Models:** the picker shows the human-facing aliases `local-fast`, `local-smart`,
-  `local-code`, `local-vision` and `cloud-smart` (plus the `ember-*` service aliases).
+  `local-code`, `local-vision` and `cloud-glm` (plus the `ember-*` service aliases).
   `local-smart` is the default (`DEFAULT_MODELS`).
 - **MCP:** configured inside Open WebUI (and Hermes) — never in ember-api (ADR 0010 §6).
 
