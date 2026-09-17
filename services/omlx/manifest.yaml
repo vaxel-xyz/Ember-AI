@@ -1,0 +1,19 @@
+schema_version: ods.services.v1
+service:
+  id: omlx
+  name: oMLX
+  host_env: OMLX_HOST
+  default_host: 172.20.142.184
+  port: 8000
+  health: /health
+  health_timeout: 5
+  ui_path: /docs
+  public_url_env: OMLX_PUBLIC_URL
+  type: external
+  category: core
+  x_ember:
+    node: jons-mac-mini
+    role: inference
+    managed: false
+    capabilities: [llm, vision, embeddings, rerank, stt, tts]
+    health_probe: omlx

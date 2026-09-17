@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Ember-AI operator CLI. Runs from the stack directory (default: /opt/stacks/ember or repo root).
+set -euo pipefail
+ROOT="${EMBER_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+ENV_FILE="${EMBER_ENV_FILE:-$ROOT/.env}"
+COMPOSE=(docker compose --project-directory "$ROOT" --env-file "$ENV_FILE")
+
+usage() { cat <<'EOF'
+ember up|down|restart|status|logs [service]|doctor|keys create <client> [--budget USD]
+EOF
+}
+
+load_env() { [ -f "$ENV_FILE" ] || { echo "missing $ENV_FILE (copy .env.example)"; exit 2; }; set -a; . "$ENV_FILE"; set +a; }
+
+pass() { printf '  \033[32m✓\033[0m %s\n' "$1"; }
+fail() { printf '  \033[31m✗\033[0m %s\n' "$1"; FAILED=1; }
+
+doctor() {
+  load_env; FAILED=0
+  local lite="${EMBER_LITELLM_URL:-http://127.0.0.1:${LITELLM_PORT:-4000}}"
+  local api="${EMBER_API_URL:-http://127.0.0.1:${EMBER_API_PORT:-3002}}"
+  echo "Ember doctor"
+  for v in OMLX_BASE_URL OMLX_API_KEY LITELLM_MASTER_KEY EMBER_API_KEY OMLX_CHAT_MODEL OMLX_EMBED_MODEL; do
+    [ -n "${!v:-}" ] && pass "env $v set" || fail "env $v missing"
+  done
+  if [ -z "${EMBER_SKIP_COMPOSE:-}" ]; then "${COMPOSE[@]}" config -q && pass "compose config renders" || fail "compose config invalid"; fi
+  if [ -z "${EMBER_SKIP_COMPOSE:-}" ] && command -v docker >/dev/null 2>&1 && docker ps --format '{{.Names}}' 2>/dev/null | grep -qx ember-qdrant; then
+    if [ -n "${QDRANT_API_KEY:-}" ] && [ "${QDRANT_API_KEY:-}" != "CHANGE_ME" ]; then
+      pass "Qdrant API key set"
+    else
+      fail "Qdrant is running without an API key (set QDRANT_API_KEY)"
+    fi
+  fi
+  if out=$(curl -sf -m 5 "$OMLX_BASE_URL/health"); then
+    loaded=$(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["engine_pool"]["loaded_count"])')
+    pass "oMLX reachable (loaded models: $loaded)"
+  else fail "oMLX unreachable at $OMLX_BASE_URL"; fi
+  curl -sf -m 5 "$lite/health/readiness" >/dev/null && pass "LiteLLM readiness" || fail "LiteLLM readiness at $lite"
+  curl -sf -m 5 "$api/api/health" >/dev/null && pass "ember-api health" || fail "ember-api health at $api"
+  if out=$(curl -sf -m 300 "$lite/v1/chat/completions" -H "Authorization: Bearer $LITELLM_MASTER_KEY" -H 'Content-Type: application/json' \
+      -d '{"model":"local-smart","messages":[{"role":"user","content":"Reply with the single word: pong"}],"max_tokens":8}'); then
+    pass "local-smart completion: $(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["choices"][0]["message"]["content"].strip()[:40])')"
+  else fail "local-smart completion failed"; fi
+  if out=$(curl -sf -m 120 "$lite/v1/embeddings" -H "Authorization: Bearer $LITELLM_MASTER_KEY" -H 'Content-Type: application/json' \
+      -d '{"model":"ember-embed","input":"ember doctor"}'); then
+    pass "ember-embed vector length $(printf '%s' "$out" | python3 -c 'import json,sys;print(len(json.load(sys.stdin)["data"][0]["embedding"]))')"
+  else fail "ember-embed failed"; fi
+  [ "$FAILED" = 0 ] && echo "all checks passed" || { echo "some checks failed"; exit 1; }
+}
+
+keys_create() {
+  load_env
+  local client="$1"; shift; local budget=""
+  while [ $# -gt 0 ]; do case "$1" in --budget) budget="$2"; shift 2;; *) shift;; esac; done
+  local lite="${EMBER_LITELLM_URL:-http://127.0.0.1:${LITELLM_PORT:-4000}}"
+  local payload
+  payload=$(python3 -c 'import json,sys;c,b=sys.argv[1],sys.argv[2];d={"key_alias":c,"metadata":{"client":c}};b and d.update(max_budget=float(b));print(json.dumps(d))' "$client" "$budget")
+  curl -sf "$lite/key/generate" -H "Authorization: Bearer $LITELLM_MASTER_KEY" -H 'Content-Type: application/json' -d "$payload" \
+    | python3 -c 'import json,sys;d=json.load(sys.stdin);print("client:",d.get("key_alias"));print("key:",d["key"])'
+}
+
+case "${1:-}" in
+  up) load_env; "${COMPOSE[@]}" up -d --build ;;
+  down) load_env; "${COMPOSE[@]}" down ;;
+  restart) load_env; "${COMPOSE[@]}" up -d --build --force-recreate ;;
+  status) load_env; "${COMPOSE[@]}" ps ;;
+  logs) load_env; shift; "${COMPOSE[@]}" logs -f --tail=200 "$@" ;;
+  doctor) doctor ;;
+  keys) shift; [ "${1:-}" = create ] && [ -n "${2:-}" ] || { usage; exit 2; }; shift; keys_create "$@" ;;
+  *) usage; exit 2 ;;
+esac

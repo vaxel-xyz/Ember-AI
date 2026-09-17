@@ -1,0 +1,30 @@
+{"drill":"mini-off raw capture","started_utc":"2026-09-14T18:19:17Z","samples":[
+{"t": "18:19:17", "polled_at": "2026-09-14T18:19:00.844775+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:27", "polled_at": "2026-09-14T18:19:00.844775+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:33", "polled_at": "2026-09-14T18:19:00.844775+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:38", "polled_at": "2026-09-14T18:19:00.844775+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:43", "polled_at": "2026-09-14T18:19:00.844775+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:48", "polled_at": "2026-09-14T18:19:45.874392+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:54", "polled_at": "2026-09-14T18:19:45.874392+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident", "dash_http": 200}
+,
+{"t": "18:19:59", "polled_at": "2026-09-14T18:19:45.874392+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident", "dash_http": 200}
+,
+{"t": "18:20:04", "polled_at": "2026-09-14T18:19:45.874392+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident", "dash_http": 200}
+,
+{"t": "18:20:09", "polled_at": "2026-09-14T18:19:45.874392+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident", "dash_http": 200}
+,
+{"t": "18:20:15", "polled_at": "2026-09-14T18:19:45.874392+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "2 model(s) resident", "dash_http": 200}
+,
+{"t": "18:20:20", "polled_at": "2026-09-14T18:20:17.358093+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:20:26", "polled_at": "2026-09-14T18:20:17.358093+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,
+{"t": "18:20:33", "polled_at": "2026-09-14T18:20:17.358093+00:00", "states": {"ember-api": "healthy", "ember-dashboard": "healthy", "litellm": "degraded", "litellm-postgres": "healthy", "omlx": "healthy", "qdrant": "unreachable"}, "omlx_reason": "1 model(s) resident", "dash_http": 200}
+,{"event":"omlx back ("omlx": "healthy") after 6 s"}
+],"finished_utc":"2026-09-14T18:20:33Z"}
